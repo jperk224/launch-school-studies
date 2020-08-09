@@ -1,0 +1,4 @@
+name_prompt: "Welcome! Please enter your name!"
+bad_loan_amount: "Please provide a positive loan value."
+invalid_name: "That does not appear to be a valid name, please try again."
+welcome: "Welcome to your loan calculator"
