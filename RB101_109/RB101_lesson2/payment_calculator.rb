@@ -95,9 +95,18 @@ end
 prompt("#{MESSAGES["welcome"]} #{name}!")
 
 loop do # main loop
-  amount = get_user_number('loan', MESSAGES["get_loan_amount"], MESSAGES["bad_loan_entry"])
-  apr = get_user_number('apr', MESSAGES["get_apr"], MESSAGES["bad_apr_entry"])
-  duration = get_user_number('duration', MESSAGES["get_duration"], MESSAGES["bad_duration_entry"])
+  # get key input from user
+  amount = get_user_number('loan', MESSAGES["get_loan_amount"], MESSAGES["bad_loan_entry"]).to_f
+  apr = get_user_number('apr', MESSAGES["get_apr"], MESSAGES["bad_apr_entry"]).to_f
+  duration = get_user_number('duration', MESSAGES["get_duration"], MESSAGES["bad_duration_entry"]).to_f
+
+  # calculate intermediate values from user input
+  monthly_interest = (apr / 12) / 100
+  loan_months = duration * 12
+  # monthly payment = loan_amount * (monthly_interest / (1 - (1 + monthly_interest)**(-loan_months)))
+  monthly_payment = amount * (monthly_interest / (1 - ((1 + monthly_interest)**(loan_months * (-1)))))
+  puts monthly_payment # TODO: prompt this
+
   try_again_input = ''
   loop do
     prompt(MESSAGES["calculate_another_payment"])
