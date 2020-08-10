@@ -48,13 +48,13 @@ def integer?(str)
 end
 
 def valid_number?(str)
-  (float?(str) || integer?(str)) && 
-  ((str.to_i > 0) || (str.to_f > 0))
+  (float?(str) || integer?(str)) &&
+    ((str.to_i > 0) || (str.to_f > 0))
 end
 
 def valid_rate?(str)
-  (float?(str) || integer?(str)) && 
-  ((str.to_i >= 0) || (str.to_f >= 0))
+  (float?(str) || integer?(str)) &&
+    ((str.to_i >= 0) || (str.to_f >= 0))
 end
 
 # get numerical input from the user, validate it
@@ -93,10 +93,10 @@ loop do
     prompt(MESSAGES["invalid_name"])
   else
     break
-  end  
+  end
 end
 
-prompt("#{MESSAGES["welcome"]} #{name}!")
+prompt("#{MESSAGES['welcome']} #{name}!")
 
 loop do # main loop
   # get key input from user
@@ -113,7 +113,7 @@ loop do # main loop
   else
     monthly_payment = (amount * (monthly_interest / (1 - ((1 + monthly_interest)**(loan_months * (-1)))))).round(2)
   end
-  prompt("#{MESSAGES["payment_amount_message"]} #{monthly_payment}")
+  prompt("#{MESSAGES['payment_amount_message']} #{monthly_payment}")
 
   try_again_input = ''
   loop do
