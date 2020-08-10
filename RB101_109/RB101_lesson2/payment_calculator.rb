@@ -104,8 +104,8 @@ loop do # main loop
   monthly_interest = (apr / 12) / 100
   loan_months = duration * 12
   # monthly payment = loan_amount * (monthly_interest / (1 - (1 + monthly_interest)**(-loan_months)))
-  monthly_payment = amount * (monthly_interest / (1 - ((1 + monthly_interest)**(loan_months * (-1)))))
-  puts monthly_payment # TODO: prompt this
+  monthly_payment = (amount * (monthly_interest / (1 - ((1 + monthly_interest)**(loan_months * (-1)))))).round(2)
+  prompt("#{MESSAGES["payment_amount_message"]} #{monthly_payment}")
 
   try_again_input = ''
   loop do
