@@ -96,10 +96,19 @@ prompt("#{MESSAGES["welcome"]} #{name}!")
 
 loop do # main loop
   amount = get_user_number('loan', MESSAGES["get_loan_amount"], MESSAGES["bad_loan_entry"])
-  puts amount
   apr = get_user_number('apr', MESSAGES["get_apr"], MESSAGES["bad_apr_entry"])
-  puts apr
   duration = get_user_number('duration', MESSAGES["get_duration"], MESSAGES["bad_duration_entry"])
-  puts duration
-  break
+  try_again_input = ''
+  loop do
+    prompt(MESSAGES["calculate_another_payment"])
+    try_again_input = gets.chomp.downcase
+    if try_again_input != 'n' && try_again_input != 'y'
+      prompt(MESSAGES["default_bad_entry"])
+    else
+      break
+    end
+  end
+  break if try_again_input == 'n'
 end
+
+prompt(MESSAGES["thanks"])
