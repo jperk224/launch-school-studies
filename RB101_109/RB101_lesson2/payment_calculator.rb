@@ -48,7 +48,13 @@ def integer?(str)
 end
 
 def valid_number?(str)
-  (float?(str) || integer?(str))
+  (float?(str) || integer?(str)) && 
+  ((str.to_i > 0) || (str.to_f > 0))
+end
+
+def valid_rate?(str)
+  (float?(str) || integer?(str)) && 
+  ((str.to_i >= 0) || (str.to_f >= 0))
 end
 
 # get numerical input from the user, validate it
@@ -58,22 +64,20 @@ def get_user_number(type, prompt, error_message=MESSAGES["default_bad_entry"])
   loop do
     prompt(prompt)
     user_input = gets.chomp
-    valid_entry = false
     case type
     when 'loan', 'duration'
-      if !valid_number?(user_input) || !((user_input.to_i > 0) || (user_input.to_f > 0))
+      if !valid_number?(user_input)
         prompt(error_message)
       else
-        valid_entry = true
+        break
       end
     when 'apr'
-      if !valid_number?(user_input) || !((user_input.to_i >= 0) || (user_input.to_f >= 0))
+      if !valid_rate?(user_input)
         prompt(error_message)
       else
-        valid_entry = true
+        break
       end
     end
-    break if valid_entry
   end
   user_input
 end
@@ -104,7 +108,11 @@ loop do # main loop
   monthly_interest = (apr / 12) / 100
   loan_months = duration * 12
   # monthly payment = loan_amount * (monthly_interest / (1 - (1 + monthly_interest)**(-loan_months)))
-  monthly_payment = (amount * (monthly_interest / (1 - ((1 + monthly_interest)**(loan_months * (-1)))))).round(2)
+  if monthly_interest == 0.00
+    monthly_payment = (amount / loan_months).round(2)
+  else
+    monthly_payment = (amount * (monthly_interest / (1 - ((1 + monthly_interest)**(loan_months * (-1)))))).round(2)
+  end
   prompt("#{MESSAGES["payment_amount_message"]} #{monthly_payment}")
 
   try_again_input = ''
