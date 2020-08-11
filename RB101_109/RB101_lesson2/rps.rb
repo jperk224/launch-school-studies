@@ -70,16 +70,16 @@ def map_player_entry_to_valid_choice(char)
 end
 
 def win?(first, second)
-  (first == 'scissors' && second == 'paper') ||
-    (first == 'paper' && second == 'rock') ||
-    (first == 'rock' && second == 'lizard') ||
-    (first == 'lizard' && second == 'spock') ||
-    (first == 'spock' && second == 'scissors') ||
-    (first == 'scissors' && second == 'lizard') ||
-    (first == 'lizard' && second == 'paper') ||
-    (first == 'paper' && second == 'spock') ||
-    (first == 'spock' && second == 'rock') ||
-    (first == 'rock' && second == 'scissors')
+
+  winning_moves = {
+    scissors: ['paper', 'lizard'],
+    paper: ['rock', 'spock'],
+    rock: ['lizard', 'scissors'],
+    lizard: ['spock', 'paper'],
+    spock: ['scissors', 'rock']
+  }
+
+  winning_moves[first.to_sym].include?(second)
 end
 
 def display_results(player, computer)
