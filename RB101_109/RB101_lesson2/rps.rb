@@ -11,14 +11,15 @@ def prompt(message)
   puts "=> #{message}"
 end
 
-def map_s()
+def map_s
   choice = ''
 
   loop do
     prompt("Please be more specific: 1) spock 2) scissors")
     choice = gets.chomp.downcase
-    break if ['1','2'].include?(choice) || ['spock', 'scissors'].include?(choice)
-    prompt("That is not a valid entry.")    
+    break if  ['1', '2'].include?(choice) ||
+              ['spock', 'scissors'].include?(choice)
+    prompt("That is not a valid entry.")
   end
 
   if choice == '1' || choice == 'spock'
@@ -28,29 +29,15 @@ def map_s()
   end
 end
 
-# def increment_score(score)
-#   score_num = score.to_i
-#   score_num += 1
-#   score_num.to_s
-# end
-
 def max_score_reached(score)
   score >= 5
 end
 
-# def increase_player_score(first, second, first_score, second_score)
-#   if win?(first, second)
-#     increment_score(first_score)
-#   elsif win?(second, first)
-#     increment_score(second_score)
-#   end
-# end
-
-def display_score(first='You', second='Computer', first_score, second_score)
+def display_score(first_score, second_score, first='You', second='Computer')
   prompt("#{first}: #{first_score}; #{second}: #{second_score}")
 end
 
-def display_winner(first='You', second='Computer', first_score, second_score)
+def display_winner(first_score, second_score, first='You', second='Computer')
   if first_score > second_score
     prompt("#{first} is GRAND WINNER!")
   elsif second_score > first_score
@@ -70,7 +57,6 @@ def map_player_entry_to_valid_choice(char)
 end
 
 def win?(first, second)
-
   winning_moves = {
     scissors: ['paper', 'lizard'],
     paper: ['rock', 'spock'],
@@ -118,7 +104,7 @@ loop do
   prompt("You chose: #{choice}; Computer chose: #{computer_choice}.")
 
   display_results(choice, computer_choice)
-  
+
   if win?(choice, computer_choice)
     player_score += 1
   elsif win?(computer_choice, choice)
