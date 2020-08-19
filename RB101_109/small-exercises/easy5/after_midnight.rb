@@ -21,10 +21,8 @@ Output: String
 Rules: Logic
 
 # Algorithm
-1. Convert 24:00 to minutes --> 24 * 60
-2. Divmod the int argument by 60 to get hours, minutes # make this its own method
-3. If hours > 24; hours = hours % 24
-4. determine signedness to (1) subtract from (24 * 60) or add to 0
+1. Get the time delta
+2. Add it to 00:00 if argment is positive, subtract if negative
 
 =end
 # Code
