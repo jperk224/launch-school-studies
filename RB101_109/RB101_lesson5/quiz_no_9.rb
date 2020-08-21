@@ -67,7 +67,7 @@ end
 
 
 
-### Option B:   ###
+### Option B:  NO  ###
 all_orders = customer_orders.map do |customer_data|  # array of hashes [ {}, {} ]
   order_value = customer_data[:orders].inject(0) do |total, order_data|
     total + order_data[:order_value]
@@ -76,19 +76,52 @@ all_orders = customer_orders.map do |customer_data|  # array of hashes [ {}, {} 
   {
     customer_id: customer_data[:customer_id],
     customer_name: customer_data[:customer_name],
-    total_order_value: order_value
+    total_order_value: order_value  # this won't be available outside the block
   }
 end
 
 
 
 
-### Option C:   ###
+### Option C:  YES ###
+all_orders = []
 
+customer_orders.each do |customer_data|
+  customer_total_orders = {
+    customer_id: customer_data[:customer_id],
+    customer_name: customer_data[:customer_name],
+    total_order_value: 0
+  }
+
+  customer_data[:orders].each do |order|
+    customer_total_orders[:total_order_value] += order[:order_value]
+  end
+
+  all_orders << customer_total_orders
+end
 
 
 
 
 ### Option D:   ###
+
+all_orders = []
+
+customer_orders.each do |customer_data|
+  cust_arr = [
+    [:customer_id, customer_data[:customer_id]],
+    [:customer_name, customer_data[:customer_name]],
+    [:total_order_value]
+  ]
+
+  order_value = 0
+  customer_data[:orders].each do |order|
+    order_value += order[:order_value]
+  end
+
+  cust_arr[2] << order_value
+
+  all_orders << cust_arr
+end
 
 
