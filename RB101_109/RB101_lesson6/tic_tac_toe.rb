@@ -1,3 +1,5 @@
+require 'pry'
+
 # Game constants
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
@@ -9,6 +11,7 @@ end
 
 # Display the board
 def display_board(board)
+  system 'clear'
   puts ""
   puts "     |     |"
   puts "  #{board[1]}  |  #{board[2]}  |  #{board[3]}"
@@ -46,10 +49,26 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def computer_places_piece!(brd)
+  square = empty_squares(brd).sample
+  brd[square] = COMPUTER_MARKER
+end
+
+def board_full?(brd)
+  empty_squares(brd).empty?
+end
+
+def someone_won?(brd)
+  false
+end
+
 # main game
 board = initialize_board
 display_board(board)
 
-player_places_piece!(board)
-# puts board.inspect
-display_board(board)
+loop do
+  player_places_piece!(board)
+  computer_places_piece!(board)
+  display_board(board)
+  break if someone_won?(board) || board_full?(board)
+end
