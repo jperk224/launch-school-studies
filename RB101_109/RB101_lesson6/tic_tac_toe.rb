@@ -67,7 +67,19 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def threat_to_computer(brd)
+def check_for_win(brd)
+  square = 0
+  WINNING_LINES.each do |line|
+    if brd.values_at(*line).count(COMPUTER_MARKER) == 2 &&
+       brd.values_at(*line).count(INITIAL_MARKER) == 1
+      square = line[brd.values_at(*line).index(INITIAL_MARKER)]
+      break
+    end
+  end
+  square
+end
+
+def check_for_threat(brd)
   square = 0
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 2 &&
@@ -76,6 +88,12 @@ def threat_to_computer(brd)
       break
     end
   end
+  square
+end
+
+def threat_to_computer(brd)
+  square = check_for_win(brd)
+  square = check_for_threat(brd) if square == 0
   square
 end
 
