@@ -67,8 +67,21 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def threat_to_computer(brd)
+  square = 0
+  WINNING_LINES.each do |line|
+    if brd.values_at(*line).count(PLAYER_MARKER) == 2 &&
+       brd.values_at(*line).count(INITIAL_MARKER) == 1
+      square = line[brd.values_at(*line).index(INITIAL_MARKER)]
+      break
+    end
+  end
+  square
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = threat_to_computer(brd)
+  square = empty_squares(brd).sample if square == 0
   brd[square] = COMPUTER_MARKER
 end
 
