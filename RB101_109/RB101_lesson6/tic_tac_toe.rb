@@ -67,10 +67,10 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def check_for_win(brd)
+def check_for_move(brd, marker)
   square = 0
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(COMPUTER_MARKER) == 2 &&
+    if brd.values_at(*line).count(marker) == 2 &&
        brd.values_at(*line).count(INITIAL_MARKER) == 1
       square = line[brd.values_at(*line).index(INITIAL_MARKER)]
       break
@@ -79,26 +79,15 @@ def check_for_win(brd)
   square
 end
 
-def check_for_threat(brd)
-  square = 0
-  WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 2 &&
-       brd.values_at(*line).count(INITIAL_MARKER) == 1
-      square = line[brd.values_at(*line).index(INITIAL_MARKER)]
-      break
-    end
-  end
-  square
-end
-
-def threat_to_computer(brd)
-  square = check_for_win(brd)
-  square = check_for_threat(brd) if square == 0
+def strategic_move(brd)
+  square = check_for_move(brd, COMPUTER_MARKER) # check for win first
+  square = check_for_move(brd, PLAYER_MARKER) if square == 0
+  square = 5 if empty_squares(brd).include?(5)
   square
 end
 
 def computer_places_piece!(brd)
-  square = threat_to_computer(brd)
+  square = strategic_move(brd)
   square = empty_squares(brd).sample if square == 0
   brd[square] = COMPUTER_MARKER
 end
