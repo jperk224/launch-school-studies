@@ -52,7 +52,7 @@ def joinor(arr, delimiter=', ', joiner_word='or')
   if array_string.length >= 1
     "#{array_string} #{joiner_word} #{last_element}"
   else
-    "#{last_element}"
+    last_element.to_s
   end
 end
 
@@ -91,26 +91,54 @@ def detect_winner(brd)
   nil
 end
 
+def advance_game
+  loop do
+    prompt "Press Return key to continue."
+    entry = gets.chomp
+    break if entry == ""
+  end
+end
+
 # main game
 loop do
-  board = initialize_board
-
+  player_score = 0
+  computer_score = 0
   loop do
+    board = initialize_board
+    loop do
+      display_board(board)
+
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
+
     display_board(board)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+    else
+      prompt "It's a tie!"
+    end
 
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-  end
+    if detect_winner(board) == 'Player'
+      player_score += 1
+    elsif detect_winner(board) == 'Computer'
+      computer_score += 1
+    end
 
-  display_board(board)
+    prompt "Player Score: #{player_score} | Computer Score: #{computer_score}"
+    advance_game
 
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
+    if player_score >= 5
+      prompt "Player is grand champion!"
+      break
+    elsif computer_score >= 5
+      prompt "Computer is grand champion!"
+      break
+    end
   end
 
   prompt "Play again? (Y/N)"
