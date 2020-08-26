@@ -58,6 +58,24 @@ def get_card_faces(hand)
   hand.map { |card| card[1] }
 end
 
+def calculate_hand_value(hand)
+  ace_count = get_card_faces(hand).count('A')
+  sum = 0
+  get_card_faces(hand).each do |card|
+    if (2..10).cover?(card)
+      sum += card
+    elsif %w(Jack Queen King).include?(card)
+      sum += 10
+    elsif ace_count > 1
+      sum += 1
+      ace_count -= 1
+    else
+      sum += 11
+    end
+  end
+  sum
+end
+
 def display_dealer_hand(hand)
   card_values = get_card_faces(hand)
   card_values[-1] = "Unknown Card"
@@ -75,15 +93,23 @@ def display_hands(player_hand, dealer_hand)
 end
 
 # Main game
-deck = initialize_deck
-player_hand = []
-dealer_hand = []
-
 prompt(MESSAGES["welcome"])
 
-# Initial Deal
-2.times { player_hand << deal_card!(deck) }
-2.times { dealer_hand << deal_card!(deck) }
-p player_hand
-p dealer_hand
-display_hands(player_hand, dealer_hand)
+loop do
+  deck = initialize_deck
+  player_hand = []
+  dealer_hand = []
+
+  # Initial Deal
+  2.times { player_hand << deal_card!(deck) }
+  2.times { dealer_hand << deal_card!(deck) }
+  player_sum = calculate_hand_value(player_hand)
+  dealer_sum = calculate_hand_value(dealer_hand)
+
+  # Enter player loop
+  display_hands(player_hand, dealer_hand)
+
+  prompt(MESSAGES["play_again"])
+  play_again = gets.chomp.downcase
+  break unless play_again.start_with?('y')
+end

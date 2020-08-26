@@ -1,17 +1,27 @@
 require 'pry'
 
-def joinor(array, delimeter=', ', join_word='and')
-  last_element = array[-1]
-  if array.length == 0
-    ""
-  elsif array.length == 1
-    last_element.to_s
-  else
-    sliced_array = array.slice(0, array.length - 1)
-    "#{sliced_array.join(delimeter)} #{join_word} #{last_element}"
-  end
+def get_card_faces(hand)
+  hand.map { |card| card[1] }
 end
 
-p joinor([1])
-p joinor([1, 2])
-p joinor([1, 4, 5, "Queen"])
+def calculate_hand_value(hand)
+  ace_count = get_card_faces(hand).count('A')
+  sum = 0
+  get_card_faces(hand).each do |card|
+    if (2..10).cover?(card)
+      sum += card
+    elsif %w(J Q K).include?(card)
+      sum += 10
+    elsif ace_count > 1
+      sum += 1
+      ace_count -= 1
+    else
+      sum += 11
+    end
+  end
+  sum
+end
+
+p calculate_hand_value([["Clubs", 7], ["Diamonds", "K"], ["Diamonds", "J"], ["Clubs", 5]]) == 32
+p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "J"], ["Clubs", 5]]) == 27
+p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "A"], ["Clubs", "A"]]) == 14

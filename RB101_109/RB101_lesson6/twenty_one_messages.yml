@@ -1,3 +1,4 @@
 welcome: "Welcome to 21!"
 dealer_shows: "Dealer Shows:"
 player_shows: "Player Shows:"
+play_again: "Would you like to play again ([Y]es/[N]o)?"
