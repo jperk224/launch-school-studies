@@ -112,8 +112,10 @@ end
 def calculate_winner(player_sum, dealer_sum)
   if player_sum > dealer_sum
     "Player"
-  else
+  elsif dealer_sum > player_sum
     "Dealer"
+  else
+    "Tie"
   end
 end
 
@@ -122,8 +124,10 @@ def display_winner(player_sum, dealer_sum)
   puts "Dealer Total: #{dealer_sum}"
   if calculate_winner(player_sum, dealer_sum) == "Player"
     prompt(MESSAGES["player_win"])
-  else
+  elsif calculate_winner(player_sum, dealer_sum) == "Dealer"
     prompt(MESSAGES["dealer_win"])
+  else
+    prompt(MESSAGES["tie"])
   end
 end
 
