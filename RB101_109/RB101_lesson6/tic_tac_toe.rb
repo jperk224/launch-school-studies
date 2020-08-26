@@ -141,28 +141,36 @@ def choose_first_player
   end
 end
 
+def place_piece!(brd, current_player)
+  if current_player.downcase == 'player'
+    display_board(brd)
+    player_places_piece!(brd)
+  else
+    computer_places_piece!(brd)
+    display_board(brd)
+  end
+end
+
+def alternate_player(current_player)
+  if current_player.downcase == 'player'
+    'Computer'
+  else
+    'Player'
+  end
+end
+
 # main game
 loop do
   player_score = 0
   computer_score = 0
   first_move = choose_first_player
   loop do
+    current_player = first_move
     board = initialize_board
     loop do
-      if first_move == 'Player'
-        display_board(board)
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-        computer_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-        display_board(board)
-      else
-        computer_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-        display_board(board)
-        player_places_piece!(board)
-        break if someone_won?(board) || board_full?(board)
-      end
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
+      break if someone_won?(board) || board_full?(board)
     end
 
     display_board(board)
