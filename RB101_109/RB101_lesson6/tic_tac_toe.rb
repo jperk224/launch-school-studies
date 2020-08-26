@@ -7,6 +7,8 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+VALID_PLAYERS = ['Choose', 'Player', 'Computer']
+FIRST_PLAYER = 'Choose' # Valid options are 'Choose', 'Player' 'Computer'
 
 def prompt(message)
   puts "=> #{message}"
@@ -119,20 +121,48 @@ def advance_game
   end
 end
 
+def prompt_for_player
+  options = VALID_PLAYERS.select { |option| option != 'Choose' }
+  choice = ''
+  loop do
+    prompt "Please choose who will go first (#{options.join(', ')})"
+    choice = gets.chomp.capitalize
+    break if VALID_PLAYERS.include?(choice)
+    prompt "That is not a valid choice."
+  end
+  choice
+end
+
+def choose_first_player
+  if FIRST_PLAYER == 'Choose'
+    prompt_for_player
+  else
+    FIRST_PLAYER
+  end
+end
+
 # main game
 loop do
   player_score = 0
   computer_score = 0
+  first_move = choose_first_player
   loop do
     board = initialize_board
     loop do
-      display_board(board)
-
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
+      if first_move == 'Player'
+        display_board(board)
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+        display_board(board)
+      else
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+        display_board(board)
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+      end
     end
 
     display_board(board)
