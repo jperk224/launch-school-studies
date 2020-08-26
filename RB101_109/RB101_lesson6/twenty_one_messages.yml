@@ -1,4 +1,8 @@
 welcome: "Welcome to 21!"
 dealer_shows: "Dealer Shows:"
 player_shows: "Player Shows:"
+player_choice: "What would you like to do ([H]it/[S]tay)?"
+invalid_selection: "That is not a valid choice."
+busted: "You busted! Better luck next time"
 play_again: "Would you like to play again ([Y]es/[N]o)?"
+goodbye: "Thanks for playing 21!"

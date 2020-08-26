@@ -20,6 +20,7 @@ require 'yaml'
 
 # Game Constants
 MESSAGES = YAML.load_file('twenty_one_messages.yml')
+VALID_MOVES = %w(h s hit stay)
 
 # Game Methods
 def prompt(string)
@@ -92,24 +93,51 @@ def display_hands(player_hand, dealer_hand)
   display_player_hand(player_hand)
 end
 
+def player_move
+  choice = ''
+  loop do
+    prompt(MESSAGES["player_choice"])
+    choice = gets.chomp.downcase
+    break if VALID_MOVES.include?(choice)
+    prompt(MESSAGES["invalid_selection"])
+  end
+  choice
+end
+
 # Main game
-prompt(MESSAGES["welcome"])
-
 loop do
-  deck = initialize_deck
-  player_hand = []
-  dealer_hand = []
+  prompt(MESSAGES["welcome"])
+  loop do
+    deck = initialize_deck
+    player_hand = []
+    dealer_hand = []
 
-  # Initial Deal
-  2.times { player_hand << deal_card!(deck) }
-  2.times { dealer_hand << deal_card!(deck) }
-  player_sum = calculate_hand_value(player_hand)
-  dealer_sum = calculate_hand_value(dealer_hand)
+    # Initial Deal
+    2.times { player_hand << deal_card!(deck) }
+    2.times { dealer_hand << deal_card!(deck) }
+    player_sum = calculate_hand_value(player_hand)
+    dealer_sum = calculate_hand_value(dealer_hand)
 
-  # Enter player loop
-  display_hands(player_hand, dealer_hand)
+    # Enter player loop
+    while player_sum < 21
+      display_hands(player_hand, dealer_hand)
+      next_move = player_move
+      break if next_move == 's' || next_move == 'stay'
+      player_hand << deal_card!(deck)
+      player_sum = calculate_hand_value(player_hand)
+    end
 
+    # Bust if player > 21
+    if player_sum > 21
+      prompt(MESSAGES["busted"])
+      break
+    end
+
+    # Dealer loop
+  end
   prompt(MESSAGES["play_again"])
   play_again = gets.chomp.downcase
   break unless play_again.start_with?('y')
 end
+
+prompt(MESSAGES["goodbye"])
