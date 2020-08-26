@@ -108,13 +108,21 @@ def bust?(sum)
   sum > 21
 end
 
+def calculate_winner(player_sum, dealer_sum)
+  if player_sum > dealer_sum
+    "Player"
+  else
+    "Dealer"
+  end
+end
+
 def display_winner(player_sum, dealer_sum)
   puts "Player Total: #{player_sum}"
   puts "Dealer Total: #{dealer_sum}"
-  if player_sum > dealer_sum
-    puts "Player wins!"
+  if calculate_winner(player_sum, dealer_sum) == "Player"
+    prompt(MESSAGES["player_win"])
   else
-    puts "Dealer wins!"
+    prompt(MESSAGES["dealer_win"])
   end
 end
 
