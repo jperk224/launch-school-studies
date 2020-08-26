@@ -104,6 +104,20 @@ def player_move
   choice
 end
 
+def bust?(sum)
+  sum > 21
+end
+
+def display_winner(player_sum, dealer_sum)
+  puts "Player Total: #{player_sum}"
+  puts "Dealer Total: #{dealer_sum}"
+  if player_sum > dealer_sum
+    puts "Player wins!"
+  else
+    puts "Dealer wins!"
+  end
+end
+
 # Main game
 loop do
   prompt(MESSAGES["welcome"])
@@ -128,12 +142,28 @@ loop do
     end
 
     # Bust if player > 21
-    if player_sum > 21
-      prompt(MESSAGES["busted"])
+    if bust?(player_sum)
+      prompt(MESSAGES["player_busted"])
       break
     end
 
     # Dealer loop
+    while dealer_sum < 17
+      display_hands(player_hand, dealer_hand)
+      prompt(MESSAGES["dealer_hit"])
+      dealer_hand << deal_card!(deck)
+      dealer_sum = calculate_hand_value(dealer_hand)
+    end
+
+    # Bust if dealer > 21
+    if bust?(dealer_sum)
+      prompt(MESSAGES["dealer_busted"])
+      break
+    end
+
+    display_hands(player_hand, dealer_hand)
+    display_winner(player_sum, dealer_sum)
+    break
   end
   prompt(MESSAGES["play_again"])
   play_again = gets.chomp.downcase
