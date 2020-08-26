@@ -74,6 +74,7 @@ def calculate_hand_value(hand)
       sum += 11
     end
   end
+  sum -= 10 if sum > 21 && ace_count == 1 # adjust down last ace if needed
   sum
 end
 

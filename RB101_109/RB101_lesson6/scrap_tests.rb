@@ -19,9 +19,12 @@ def calculate_hand_value(hand)
       sum += 11
     end
   end
+  sum -= 10 if sum > 21 && ace_count == 1 # adjust down last ace if needed
   sum
 end
 
-p calculate_hand_value([["Clubs", 7], ["Diamonds", "K"], ["Diamonds", "J"], ["Clubs", 5]]) == 32
-p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "J"], ["Clubs", 5]]) == 27
-p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "A"], ["Clubs", "A"]]) == 14
+# p calculate_hand_value([["Clubs", 7], ["Diamonds", "K"], ["Diamonds", "J"], ["Clubs", 5]]) == 32
+# p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "J"], ["Clubs", 5]]) == 17
+# p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "A"], ["Clubs", "A"]]) == 14
+# p calculate_hand_value([["Clubs", "A"], ["Diamonds", "A"], ["Diamonds", "J"]]) == 12
+# p calculate_hand_value([["Clubs", "A"], ["Diamonds", "K"], ["Diamonds", 5]]) == 16
