@@ -115,9 +115,11 @@ def bust?(sum)
 end
 
 def calculate_winner(player_sum, dealer_sum)
-  if player_sum > dealer_sum
+  if  ((player_sum > dealer_sum) || bust?(dealer_sum)) &&
+      !bust?(player_sum)
     "Player"
-  elsif dealer_sum > player_sum
+  elsif ((dealer_sum > player_sum) || bust?(player_sum)) &&
+        !bust?(dealer_sum)
     "Dealer"
   else
     "Tie"
@@ -136,6 +138,12 @@ def display_winner(player_sum, dealer_sum)
     prompt(MESSAGES["tie"])
   end
   puts "*****************************"
+end
+
+def display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
+  prompt "Player: #{show_full_hand(player_hand)}"
+  prompt "Dealer: #{show_full_hand(dealer_hand)}"
+  display_winner(player_sum, dealer_sum)
 end
 
 # Main game
@@ -164,6 +172,7 @@ loop do
     # Bust if player > 21
     if bust?(player_sum)
       puts(MESSAGES["player_busted"])
+      display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
       break
     end
 
@@ -178,12 +187,11 @@ loop do
     # Bust if dealer > 21
     if bust?(dealer_sum)
       puts(MESSAGES["dealer_busted"])
+      display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
       break
     end
 
-    prompt "Player: #{show_full_hand(player_hand)}"
-    prompt "Dealer: #{show_full_hand(dealer_hand)}"
-    display_winner(player_sum, dealer_sum)
+    display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
     break
   end
   prompt(MESSAGES["play_again"])
