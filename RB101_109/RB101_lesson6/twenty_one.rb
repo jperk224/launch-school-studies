@@ -148,7 +148,9 @@ def advance_game
   end
 end
 
-def display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
+def display_game_summary(player_hand, dealer_hand,
+                         player_sum, dealer_sum,
+                         player_win_count, dealer_win_count)
   prompt "Player: #{show_full_hand(player_hand)}"
   prompt "Dealer: #{show_full_hand(dealer_hand)}"
   display_winner(player_sum, dealer_sum)
@@ -166,7 +168,7 @@ loop do
   advance_game
   loop do
     loop do
-      system'clear'
+      system 'clear'
       deck = initialize_deck
       player_hand = []
       dealer_hand = []
@@ -190,7 +192,8 @@ loop do
       if bust?(player_sum)
         puts(MESSAGES["player_busted"])
         dealer_win_count += 1
-        display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
+        display_game_summary(player_hand, dealer_hand, player_sum,
+                             dealer_sum, player_win_count, dealer_win_count)
         break
       end
 
@@ -206,19 +209,25 @@ loop do
       if bust?(dealer_sum)
         puts(MESSAGES["dealer_busted"])
         player_win_count += 1
-        display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
+        display_game_summary(player_hand, dealer_hand, player_sum,
+                             dealer_sum, player_win_count, dealer_win_count)
         break
       end
 
-      player_win_count += 1 if calculate_winner(player_sum, dealer_sum) == 'Player'
-      dealer_win_count += 1 if calculate_winner(player_sum, dealer_sum) == 'Dealer'
+      if calculate_winner(player_sum, dealer_sum) == 'Player'
+        player_win_count += 1
+      end
+      if calculate_winner(player_sum, dealer_sum) == 'Dealer'
+        dealer_win_count += 1
+      end
 
-      display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
+      display_game_summary(player_hand, dealer_hand, player_sum,
+                           dealer_sum, player_win_count, dealer_win_count)
       break
     end
     break if player_win_count >= 5 || dealer_win_count >= 5
   end
-  
+
   if player_win_count > dealer_win_count
     prompt(MESSAGES["player_champ"])
   else
