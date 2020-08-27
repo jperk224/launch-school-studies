@@ -94,6 +94,11 @@ def display_hands(player_hand, dealer_hand)
   display_player_hand(player_hand)
 end
 
+def show_full_hand(hand)
+  card_values = get_card_faces(hand)
+  show_cards(card_values)
+end
+
 def player_move
   choice = ''
   loop do
@@ -120,8 +125,9 @@ def calculate_winner(player_sum, dealer_sum)
 end
 
 def display_winner(player_sum, dealer_sum)
-  puts "Player Total: #{player_sum}"
-  puts "Dealer Total: #{dealer_sum}"
+  puts "*****************************"
+  prompt "Player Total: #{player_sum}"
+  prompt "Dealer Total: #{dealer_sum}"
   if calculate_winner(player_sum, dealer_sum) == "Player"
     prompt(MESSAGES["player_win"])
   elsif calculate_winner(player_sum, dealer_sum) == "Dealer"
@@ -129,6 +135,7 @@ def display_winner(player_sum, dealer_sum)
   else
     prompt(MESSAGES["tie"])
   end
+  puts "*****************************"
 end
 
 # Main game
@@ -156,25 +163,26 @@ loop do
 
     # Bust if player > 21
     if bust?(player_sum)
-      prompt(MESSAGES["player_busted"])
+      puts(MESSAGES["player_busted"])
       break
     end
 
     # Dealer loop
     while dealer_sum < 17
       display_hands(player_hand, dealer_hand)
-      prompt(MESSAGES["dealer_hit"])
+      puts(MESSAGES["dealer_hit"])
       dealer_hand << deal_card!(deck)
       dealer_sum = calculate_hand_value(dealer_hand)
     end
 
     # Bust if dealer > 21
     if bust?(dealer_sum)
-      prompt(MESSAGES["dealer_busted"])
+      puts(MESSAGES["dealer_busted"])
       break
     end
 
-    display_hands(player_hand, dealer_hand)
+    prompt "Player: #{show_full_hand(player_hand)}"
+    prompt "Dealer: #{show_full_hand(dealer_hand)}"
     display_winner(player_sum, dealer_sum)
     break
   end
