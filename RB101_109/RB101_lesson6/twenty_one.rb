@@ -1,6 +1,6 @@
 =begin
 Rules:
-- Dealer vs. Player: Get as close to 21 as possible without going over
+- Dealer vs. Player: Get as close to GAME_TARGET as possible without going over
 - Start with a normal 52-card deck (4 suits, 13 values each)
 - Each is initally dealt 2 cards
   - Player can see both cards, only one of the dealer
@@ -11,7 +11,7 @@ Rules:
 - Player goes first
   - Hit = take another card
   - Stay = Dealer turn
-- The dealer must continue to hit until the total is at least 17
+- The dealer must continue to hit until the total is at least DEALER_TARGET
 - If no bust, compare hands to see who has the highest value
 =end
 
@@ -21,6 +21,8 @@ require 'yaml'
 # Game Constants
 MESSAGES = YAML.load_file('twenty_one_messages.yml')
 VALID_MOVES = %w(h s hit stay)
+GAME_TARGET = 21
+DEALER_TARGET = 17
 
 # Game Methods
 def prompt(string)
@@ -74,7 +76,8 @@ def calculate_hand_value(hand)
       sum += 11
     end
   end
-  sum -= 10 if sum > 21 && ace_count == 1 # adjust down last ace if needed
+  # adjust down last ace if needed
+  sum -= 10 if sum > GAME_TARGET && ace_count == 1
   sum
 end
 
@@ -111,7 +114,7 @@ def player_move
 end
 
 def bust?(sum)
-  sum > 21
+  sum > GAME_TARGET
 end
 
 def calculate_winner(player_sum, dealer_sum)
@@ -180,7 +183,7 @@ loop do
       dealer_sum = calculate_hand_value(dealer_hand)
 
       # Enter player loop
-      while player_sum < 21
+      while player_sum < GAME_TARGET
         display_hands(player_hand, dealer_hand)
         next_move = player_move
         break if next_move == 's' || next_move == 'stay'
@@ -188,7 +191,7 @@ loop do
         player_sum = calculate_hand_value(player_hand)
       end
 
-      # Bust if player > 21
+      # Bust if player > GAME_TARGET
       if bust?(player_sum)
         puts(MESSAGES["player_busted"])
         dealer_win_count += 1
@@ -198,14 +201,14 @@ loop do
       end
 
       # Dealer loop
-      while dealer_sum < 17
+      while dealer_sum < DEALER_TARGET
         display_hands(player_hand, dealer_hand)
         puts(MESSAGES["dealer_hit"])
         dealer_hand << deal_card!(deck)
         dealer_sum = calculate_hand_value(dealer_hand)
       end
 
-      # Bust if dealer > 21
+      # Bust if dealer > GAME_TARGET
       if bust?(dealer_sum)
         puts(MESSAGES["dealer_busted"])
         player_win_count += 1
