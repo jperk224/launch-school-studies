@@ -140,60 +140,91 @@ def display_winner(player_sum, dealer_sum)
   puts "*****************************"
 end
 
-def display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
+def advance_game
+  loop do
+    prompt "Press Return key to continue."
+    entry = gets.chomp
+    break if entry == ""
+  end
+end
+
+def display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
   prompt "Player: #{show_full_hand(player_hand)}"
   prompt "Dealer: #{show_full_hand(dealer_hand)}"
   display_winner(player_sum, dealer_sum)
+  prompt "Player Round Wins: #{player_win_count}"
+  prompt "Dealer Round Wins: #{dealer_win_count}"
+  puts "*****************************"
+  advance_game
 end
 
 # Main game
 loop do
   prompt(MESSAGES["welcome"])
+  player_win_count = 0
+  dealer_win_count = 0
+  advance_game
   loop do
-    deck = initialize_deck
-    player_hand = []
-    dealer_hand = []
+    loop do
+      system'clear'
+      deck = initialize_deck
+      player_hand = []
+      dealer_hand = []
 
-    # Initial Deal
-    2.times { player_hand << deal_card!(deck) }
-    2.times { dealer_hand << deal_card!(deck) }
-    player_sum = calculate_hand_value(player_hand)
-    dealer_sum = calculate_hand_value(dealer_hand)
-
-    # Enter player loop
-    while player_sum < 21
-      display_hands(player_hand, dealer_hand)
-      next_move = player_move
-      break if next_move == 's' || next_move == 'stay'
-      player_hand << deal_card!(deck)
+      # Initial Deal
+      2.times { player_hand << deal_card!(deck) }
+      2.times { dealer_hand << deal_card!(deck) }
       player_sum = calculate_hand_value(player_hand)
-    end
-
-    # Bust if player > 21
-    if bust?(player_sum)
-      puts(MESSAGES["player_busted"])
-      display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
-      break
-    end
-
-    # Dealer loop
-    while dealer_sum < 17
-      display_hands(player_hand, dealer_hand)
-      puts(MESSAGES["dealer_hit"])
-      dealer_hand << deal_card!(deck)
       dealer_sum = calculate_hand_value(dealer_hand)
-    end
 
-    # Bust if dealer > 21
-    if bust?(dealer_sum)
-      puts(MESSAGES["dealer_busted"])
-      display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
+      # Enter player loop
+      while player_sum < 21
+        display_hands(player_hand, dealer_hand)
+        next_move = player_move
+        break if next_move == 's' || next_move == 'stay'
+        player_hand << deal_card!(deck)
+        player_sum = calculate_hand_value(player_hand)
+      end
+
+      # Bust if player > 21
+      if bust?(player_sum)
+        puts(MESSAGES["player_busted"])
+        dealer_win_count += 1
+        display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
+        break
+      end
+
+      # Dealer loop
+      while dealer_sum < 17
+        display_hands(player_hand, dealer_hand)
+        puts(MESSAGES["dealer_hit"])
+        dealer_hand << deal_card!(deck)
+        dealer_sum = calculate_hand_value(dealer_hand)
+      end
+
+      # Bust if dealer > 21
+      if bust?(dealer_sum)
+        puts(MESSAGES["dealer_busted"])
+        player_win_count += 1
+        display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
+        break
+      end
+
+      player_win_count += 1 if calculate_winner(player_sum, dealer_sum) == 'Player'
+      dealer_win_count += 1 if calculate_winner(player_sum, dealer_sum) == 'Dealer'
+
+      display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum, player_win_count, dealer_win_count)
       break
     end
-
-    display_game_summary(player_hand, dealer_hand, player_sum, dealer_sum)
-    break
+    break if player_win_count >= 5 || dealer_win_count >= 5
   end
+  
+  if player_win_count > dealer_win_count
+    prompt(MESSAGES["player_champ"])
+  else
+    prompt(MESSAGES["dealer_champ"])
+  end
+
   prompt(MESSAGES["play_again"])
   play_again = gets.chomp.downcase
   break unless play_again.start_with?('y')
