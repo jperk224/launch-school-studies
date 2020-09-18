@@ -21,7 +21,7 @@ block_word?('jest') == true
 
 
 # code
-
+=begin
 LETTER_BLOCKS = {
   'B' => 'O',
   'X' => 'K',
@@ -53,6 +53,18 @@ def block_word?(string)
   is_block
 end
 
+=end
+
+LETTER_BLOCKS = %w(BO XK DQ CP NA GT RE FS JW HU VI LY ZM)
+
+def block_word?(string)
+  string = string.upcase
+  LETTER_BLOCKS.none? do |block|
+    string.count(block) >= 2
+  end
+end
+
 p block_word?('BATCH') == true
 p block_word?('BUTCH') == false
 p block_word?('jest') == true
+p block_word?(' ')
