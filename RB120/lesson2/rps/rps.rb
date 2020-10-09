@@ -2,58 +2,113 @@
 class Move
   VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock']
 
+  attr_reader :value
+
   def initialize(value)
-    @value = value
+    @value = set_move_object(value)
   end
 
-  def scissors?
-    @value == 'scissors'
-  end
-
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
-  def lizard?
-    @value == 'lizard'
-  end
-
-  def spock?
-    @value == 'spock'
+  def set_move_object(value)
+    case value
+    when 'rock'
+      Rock.new
+    when 'paper'
+      Paper.new
+    when 'scissors'
+      Scissors.new
+    when 'lizard'
+      Lizard.new
+    when 'spock'
+      Spock.new
+    end
   end
 
   def to_s
-    @value
+    value.to_s
   end
 
   def >(other_move)
-    (rock? && (other_move.lizard? || other_move.scissors?)) ||
-      (paper? && (other_move.rock? || other_move.spock?)) ||
-      (scissors? && (other_move.paper? || other_move.lizard?)) ||
-      (lizard? && (other_move.spock? || other_move.paper?)) ||
-      (spock? && (other_move.scissors? || other_move.rock?))
+    value.defeats.include?(other_move.to_s)
   end
 
   def <(other_move)
-    (rock? && (other_move.paper? || other_move.spock?)) ||
-      (paper? && (other_move.scissors? || other_move.lizard?)) ||
-      (scissors? && (other_move.rock? || other_move.spock?)) ||
-      (lizard? && (other_move.rock? || other_move.scissors?)) ||
-      (spock? && (other_move.lizard? || other_move.paper?))
+    value.loses_to.include?(other_move.to_s)
+  end
+end
+
+class Rock
+  def to_s
+    'rock'
+  end
+  
+  attr_reader :defeats, :loses_to
+
+  def initialize
+    @defeats = ['scissors', 'lizard']
+    @loses_to = ['paper', 'spock']
+  end
+end
+
+class Paper
+  def to_s
+    'paper'
+  end
+
+  attr_reader :defeats, :loses_to
+
+  def initialize
+    @defeats = ['spock', 'rock']
+    @loses_to = ['scissors', 'lizard']
+  end
+end
+
+class Scissors
+  def to_s
+    'scissors'
+  end
+
+  attr_reader :defeats, :loses_to
+
+  def initialize
+    @defeats = ['paper', 'lizard']
+    @loses_to = ['rock', 'spock']
+  end
+end
+
+class Lizard
+  def to_s
+    'lizard'
+  end
+
+  attr_reader :defeats, :loses_to
+
+  def initialize
+    @defeats = ['spock', 'paper']
+    @loses_to = ['scissors', 'rock']
+  end
+end
+
+class Spock
+  def to_s
+    'spock'
+  end
+  
+  attr_reader :defeats, :loses_to
+
+  def initialize
+    @defeats = ['scissors', 'rock']
+    @loses_to = ['lizard', 'paper']
   end
 end
 
 class Player
-  attr_accessor :move, :name, :score
+  attr_accessor :move, :name, :score, :move_history
 
   def initialize
     @move = nil
     @score = 0
     set_name
+    @move_history = []
   end
 
   def human?
@@ -62,6 +117,10 @@ class Player
 
   def did_win?
     score >= 10
+  end
+
+  def add_move_to_history(move)
+    move_history << move
   end
 end
 
@@ -80,12 +139,13 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Please choose rock, paper, or scissors:"
+      puts "Please choose rock, paper, scissors, lizard, or spock:"
       choice = gets.chomp
       break if Move::VALUES.include?(choice)
       puts "Sorry, invalid choice."
     end
     self.move = Move.new(choice)
+    self.add_move_to_history(move)
   end
 end
 
@@ -96,6 +156,7 @@ class Computer < Player
 
   def choose
     self.move = Move.new(Move::VALUES.sample)
+    self.add_move_to_history(move)
   end
 end
 
@@ -111,16 +172,16 @@ class RPSGame
   end
 
   def display_welcome_message
-    puts "Welcome to Rock, Paper Scissors! First to #{GAME_SCORE_CAP} wins!"
+    puts "Welcome to Rock, Paper, Scissors, Lizard, or Spock! First to #{GAME_SCORE_CAP} wins!"
   end
 
   def display_goodbye_message
-    puts "Thanks for playing Rock, Paper, Scissors.  Good bye!"
+    puts "Thanks for playing.  Good bye!"
   end
 
   def display_moves
-    puts "#{human.name} chose #{human.move}"
-    puts "#{computer.name} chose #{computer.move}"
+    puts "#{human.name} chose #{human.move.value}"
+    puts "#{computer.name} chose #{computer.move.value}"
   end
 
   def human_won_round?
@@ -192,6 +253,8 @@ class RPSGame
     display_welcome_message
     human.score = 0
     computer.score = 0
+    human.move_history = []
+    computer.move_history = []
   end
 
   def choose_moves
@@ -206,6 +269,11 @@ class RPSGame
     display_scores
   end
 
+  def display_move_history(player)
+    puts "Move History for #{player.name}:"
+    puts player.move_history.join(', ')
+  end
+
   def display_game_results
     display_game_winner
     display_scores("Final")
@@ -217,6 +285,8 @@ class RPSGame
       loop do
         choose_moves
         display_round_results
+        display_move_history(human)
+        display_move_history(computer)
         break if game_winner?
       end
       display_game_results
