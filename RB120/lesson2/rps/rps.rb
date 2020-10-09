@@ -36,7 +36,7 @@ class Move
 end
 
 class Player
-    attr_accessor :move, :name, :score
+  attr_accessor :move, :name, :score
 
   def initialize
     @move = nil
@@ -129,11 +129,9 @@ class RPSGame
 
   def increment_score
     if human_won_round?
-      human.score +=1
+      human.score += 1
     elsif computer_won_round?
-      computer.score +=1
-    else
-      nil
+      computer.score += 1
     end
   end
 
@@ -178,22 +176,38 @@ class RPSGame
     return false if answer == 'n'
   end
 
+  def game_start
+    display_welcome_message
+    human.score = 0
+    computer.score = 0
+  end
+
+  def choose_moves
+    human.choose
+    computer.choose
+    display_moves
+  end
+
+  def display_round_results
+    increment_score
+    display_round_winner
+    display_scores
+  end
+
+  def display_game_results
+    display_game_winner
+    display_scores("Final")
+  end
+
   def play
     loop do
-      display_welcome_message
-      human.score = 0
-      computer.score = 0
+      game_start
       loop do
-        human.choose
-        computer.choose
-        display_moves
-        increment_score
-        display_round_winner
-        display_scores
+        choose_moves
+        display_round_results
         break if game_winner?
       end
-      display_game_winner
-      display_scores("Final")
+      display_game_results
       break unless play_again?
     end
     display_goodbye_message
