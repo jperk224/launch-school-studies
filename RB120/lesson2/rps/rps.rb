@@ -36,15 +36,20 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name
+    attr_accessor :move, :name, :score
 
   def initialize
     @move = nil
+    @score = 0
     set_name
   end
 
   def human?
     @player_type == :human
+  end
+
+  def did_win?
+    score >= 10
   end
 end
 
@@ -84,6 +89,8 @@ end
 
 # Orchestration Engine
 class RPSGame
+  GAME_SCORE_CAP = 10
+
   attr_accessor :human, :computer
 
   def initialize
@@ -92,7 +99,7 @@ class RPSGame
   end
 
   def display_welcome_message
-    puts "Welcome to Rock, Paper Scissors!"
+    puts "Welcome to Rock, Paper Scissors! First to #{GAME_SCORE_CAP} wins!"
   end
 
   def display_goodbye_message
@@ -104,13 +111,59 @@ class RPSGame
     puts "#{computer.name} chose #{computer.move}"
   end
 
-  def display_winner
-    if human.move > computer.move
+  def human_won_round?
+    human.move > computer.move
+  end
+
+  def computer_won_round?
+    human.move < computer.move
+  end
+
+  def human_won_game?
+    human.score >= GAME_SCORE_CAP
+  end
+
+  def computer_won_game?
+    computer.score >= GAME_SCORE_CAP
+  end
+
+  def increment_score
+    if human_won_round?
+      human.score +=1
+    elsif computer_won_round?
+      computer.score +=1
+    else
+      nil
+    end
+  end
+
+  def display_round_winner
+    if human_won_round?
       puts "#{human.name} won!"
-    elsif human.move < computer.move
+    elsif computer_won_round?
       puts "#{computer.name} won!"
     else
       puts "It's a tie!"
+    end
+  end
+
+  def display_scores(string = "Current")
+    puts "-----------------------------------"
+    puts "#{string} Scores:"
+    puts "#{human.name}: #{human.score}"
+    puts "#{computer.name}: #{computer.score}"
+    puts "-----------------------------------"
+  end
+
+  def game_winner?
+    human_won_game? || computer_won_game?
+  end
+
+  def display_game_winner
+    if human_won_game?
+      puts "#{human.name} won the game!"
+    elsif computer_won_game?
+      puts "#{computer.name} won the game!"
     end
   end
 
@@ -128,10 +181,19 @@ class RPSGame
   def play
     loop do
       display_welcome_message
-      human.choose
-      computer.choose
-      display_moves
-      display_winner
+      human.score = 0
+      computer.score = 0
+      loop do
+        human.choose
+        computer.choose
+        display_moves
+        increment_score
+        display_round_winner
+        display_scores
+        break if game_winner?
+      end
+      display_game_winner
+      display_scores("Final")
       break unless play_again?
     end
     display_goodbye_message
