@@ -154,8 +154,24 @@ class Computer < Player
     self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
   end
 
+  def make_choice
+    case self.name
+    when 'R2D2'
+      'rock'
+    when 'Hal'
+      (('rock ' * 10).split + ['paper', 'spock']).sample
+    when 'Chappie'
+      (('lizard ' * 10).split + ['paper', 'spock']).sample
+    when 'Sonny'
+      (('scissors ' * 10).split + ['paper', 'spock']).sample
+    when 'Number 5'
+      'spock'
+    end
+  end
+
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    self.move = Move.new(self.make_choice)
+    # self.move = Move.new(Move::VALUES.sample)
     self.add_move_to_history(move)
   end
 end
