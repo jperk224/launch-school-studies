@@ -10,9 +10,9 @@ end
 
 # game board
 class Board
-  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +  # rows
-                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +  # cols
-                  [[1, 5, 9], [3, 5, 7]]    # diagonals
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +   # rows
+                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +   # cols
+                  [[1, 5, 9], [3, 5, 7]]                # diagonals
 
   def initialize
     @squares = {}
@@ -37,22 +37,27 @@ class Board
     !!detect_winner
   end
 
-  def count_human_marker(squares)
-    squares.collect(&:marker).count(TicTacToeEngine::HUMAN_MARKER)
-  end
+  # def count_human_marker(squares)
+  #   squares.collect(&:marker).count(TicTacToeEngine::HUMAN_MARKER)
+  # end
 
-  def count_computer_marker(squares)
-    squares.collect(&:marker).count(TicTacToeEngine::COMPUTER_MARKER)
+  # def count_computer_marker(squares)
+  #   squares.collect(&:marker).count(TicTacToeEngine::COMPUTER_MARKER)
+  # end
+
+  def three_identical_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.size != 3
+    markers.min == markers.max
   end
 
   # return winning marker or nil
   def detect_winner
     # line is a 3-element array that represents a winning line
     WINNING_LINES.each do |line|
-      if count_human_marker(@squares.values_at(*line)) == 3
-        return TicTacToeEngine::HUMAN_MARKER
-      elsif count_computer_marker(@squares.values_at(*line)) == 3
-        return TicTacToeEngine::COMPUTER_MARKER
+      squares = @squares.values_at(*line)
+      if three_identical_markers?(squares)
+        return squares.first.marker
       end
     end
     nil
@@ -95,6 +100,10 @@ class Square
 
   def unmarked?
     @marker == INITIAL_MARKER
+  end
+
+  def marked?
+    @marker != INITIAL_MARKER
   end
 end
 
