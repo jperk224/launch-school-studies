@@ -112,6 +112,24 @@ class TicTacToeEngine
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
 
+  def play
+    clear
+    display_welcome_message
+    
+    loop do
+      display_board
+      play_set      
+      display_result
+      break unless play_again?
+      reset
+      display_play_again_message
+    end
+
+    display_goodbye_message
+  end
+
+  private
+
   attr_reader :board, :human, :computer
   
   def initialize
@@ -195,29 +213,18 @@ class TicTacToeEngine
     puts ""
   end
 
-  def play
-    clear
-    display_welcome_message
-    
+  def game_over?
+    board.someone_won? || board.full?
+  end
+
+  def play_set
     loop do
-      display_board
-    
-      loop do
-        human_moves
-        break if board.someone_won? || board.full?
-
-        computer_moves
-        break if board.someone_won? || board.full?
-
-        clear_screen_and_display_board
-      end
-      display_result
-      break unless play_again?
-      reset
-      display_play_again_message
+      human_moves
+      break if game_over?
+      computer_moves
+      break if game_over?
+      clear_screen_and_display_board
     end
-
-    display_goodbye_message
   end
 end
 
