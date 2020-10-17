@@ -101,6 +101,10 @@ class TicTacToeEngine
     @computer = Player.new(COMPUTER_MARKER)
   end
 
+  def clear
+    system 'clear'
+  end
+
   def display_welcome_message
     puts "Welcome to Tic Tac Toe!"
     puts ""
@@ -110,8 +114,8 @@ class TicTacToeEngine
     puts "Thanks for playing.  Goodbye!"
   end
 
-  def display_board(clear=true)
-    system 'clear' if clear
+  def display_board(clear_screen=true)
+    clear if clear_screen
     puts "You're a #{human.marker}.  Computer is #{computer.marker}."
     puts ""
     puts "     |     |"
@@ -169,7 +173,7 @@ class TicTacToeEngine
   end
 
   def play
-    system 'clear'
+    clear
     display_welcome_message
     
     loop do
@@ -187,7 +191,7 @@ class TicTacToeEngine
       display_result
       break unless play_again?
       board.reset
-      system 'clear'
+      clear
       puts "Let's play again!"
       puts ""
     end
