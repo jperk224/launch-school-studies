@@ -19,10 +19,6 @@ class Board
     reset
   end
  
-  def get_square_at(key)
-    @squares[key]
-  end
-
   def set_square_at(key, marker)
     @squares[key].marker = marker
   end
@@ -66,6 +62,20 @@ class Board
     (1..9).each do |key|
       @squares[key] = Square.new
     end
+  end
+
+  def draw
+    puts "     |     |"
+    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
+    puts "     |     |"
+    puts "-----+-----+-----"
+    puts "     |     |"
+    puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
+    puts "     |     |"
+    puts "-----+-----+-----"
+    puts "     |     |"
+    puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
+    puts "     |     |"
   end
 end
 
@@ -117,17 +127,7 @@ class TicTacToeEngine
   def display_board
     puts "You're a #{human.marker}.  Computer is #{computer.marker}."
     puts ""
-    puts "     |     |"
-    puts "  #{board.get_square_at(1)}  |  #{board.get_square_at(2)}  |  #{board.get_square_at(3)}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
-    puts "  #{board.get_square_at(4)}  |  #{board.get_square_at(5)}  |  #{board.get_square_at(6)}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
-    puts "  #{board.get_square_at(7)}  |  #{board.get_square_at(8)}  |  #{board.get_square_at(9)}"
-    puts "     |     |"
+    board.draw    
     puts ""
   end
 
