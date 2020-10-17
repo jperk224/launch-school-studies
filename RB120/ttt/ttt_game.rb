@@ -114,7 +114,7 @@ class TicTacToeEngine
     puts "Thanks for playing.  Goodbye!"
   end
 
-  def display_board(clear_screen=true)
+  def display_board(clear_screen: true)
     clear if clear_screen
     puts "You're a #{human.marker}.  Computer is #{computer.marker}."
     puts ""
@@ -177,7 +177,7 @@ class TicTacToeEngine
     display_welcome_message
     
     loop do
-      display_board(false)
+      display_board(clear_screen: false)
     
       loop do
         human_moves
