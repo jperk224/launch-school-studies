@@ -1,5 +1,3 @@
-require 'pry'
-
 class Player
   attr_reader :marker
 
@@ -18,7 +16,7 @@ class Board
     @squares = {}
     reset
   end
- 
+
   def []=(key, marker)
     @squares[key].marker = marker
   end
@@ -35,20 +33,6 @@ class Board
 
   def someone_won?
     !!detect_winner
-  end
-
-  # def count_human_marker(squares)
-  #   squares.collect(&:marker).count(TicTacToeEngine::HUMAN_MARKER)
-  # end
-
-  # def count_computer_marker(squares)
-  #   squares.collect(&:marker).count(TicTacToeEngine::COMPUTER_MARKER)
-  # end
-
-  def three_identical_markers?(squares)
-    markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.size != 3
-    markers.min == markers.max
   end
 
   # return winning marker or nil
@@ -69,6 +53,8 @@ class Board
     end
   end
 
+  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength
   def draw
     puts "     |     |"
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
@@ -81,6 +67,16 @@ class Board
     puts "     |     |"
     puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
     puts "     |     |"
+  end
+  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/MethodLength
+
+  private
+
+  def three_identical_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.size != 3
+    markers.min == markers.max
   end
 end
 
@@ -111,31 +107,36 @@ end
 class TicTacToeEngine
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
+  FIRST_TO_MOVE = HUMAN_MARKER
 
   def play
     clear
     display_welcome_message
-    
-    loop do
-      display_board
-      play_set      
-      display_result
-      break unless play_again?
-      reset
-      display_play_again_message
-    end
-
+    main_game
     display_goodbye_message
   end
 
   private
 
   attr_reader :board, :human, :computer
-  
+  attr_accessor :current_marker
+
   def initialize
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
+    @current_marker = FIRST_TO_MOVE
+  end
+
+  def main_game
+    loop do
+      display_board
+      play_set
+      display_result
+      break unless play_again?
+      reset
+      display_play_again_message
+    end
   end
 
   def clear
@@ -154,7 +155,7 @@ class TicTacToeEngine
   def display_board
     puts "You're a #{human.marker}.  Computer is #{computer.marker}."
     puts ""
-    board.draw    
+    board.draw
     puts ""
   end
 
@@ -178,6 +179,16 @@ class TicTacToeEngine
     board[board.unmarked_keys.sample] = computer.marker
   end
 
+  def current_player_moves
+    if human_turn?
+      human_moves
+      self.current_marker = COMPUTER_MARKER
+    else
+      computer_moves
+      self.current_marker = HUMAN_MARKER
+    end
+  end
+
   def display_result
     clear_screen_and_display_board
 
@@ -196,7 +207,7 @@ class TicTacToeEngine
     loop do
       puts "Would you like to play again?"
       answer = gets.chomp.downcase
-      break if %W(y n).include?(answer)
+      break if ['y', 'n'].include?(answer)
       puts "Sorry, must be y or n"
     end
 
@@ -205,6 +216,7 @@ class TicTacToeEngine
 
   def reset
     board.reset
+    self.current_marker = FIRST_TO_MOVE
     clear
   end
 
@@ -217,13 +229,15 @@ class TicTacToeEngine
     board.someone_won? || board.full?
   end
 
+  def human_turn?
+    current_marker == HUMAN_MARKER
+  end
+
   def play_set
     loop do
-      human_moves
+      current_player_moves
       break if game_over?
-      computer_moves
-      break if game_over?
-      clear_screen_and_display_board
+      clear_screen_and_display_board if human_turn?
     end
   end
 end
