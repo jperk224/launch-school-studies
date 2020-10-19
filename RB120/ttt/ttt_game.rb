@@ -1,3 +1,5 @@
+require 'pry'
+
 module Helpable # TTT helper functions
   def joinor(array, delimter, word)
     "#{array[0, array.length - 1].join(delimter)}#{delimter}#{word} #{array[-1]}"
@@ -6,9 +8,11 @@ end
 
 class Player
   attr_reader :marker
+  attr_accessor :score
 
   def initialize(marker)
     @marker = marker
+    @score = 0
   end
 end
 
@@ -116,6 +120,7 @@ class TicTacToeEngine
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
   FIRST_TO_MOVE = HUMAN_MARKER
+  GAME_CAP_SCORE = 5
 
   def play
     clear
@@ -138,11 +143,17 @@ class TicTacToeEngine
 
   def main_game
     loop do
-      display_board
-      play_set
-      display_result
+      loop do
+        display_board
+        play_set
+        increment_score
+        display_result
+        break if grand_winner?
+        reset_round
+      end
+      display_grand_winner
       break unless play_again?
-      reset
+      reset_game
       display_play_again_message
     end
   end
@@ -197,6 +208,23 @@ class TicTacToeEngine
     end
   end
 
+  def display_scores
+    puts ""
+    puts "Scores:"
+    puts "Human: #{human.score}"
+    puts "Computer: #{computer.score}"
+    puts ""
+  end
+
+  def increment_score
+    case board.detect_winner
+    when HUMAN_MARKER
+      human.score += 1
+    when COMPUTER_MARKER
+      computer.score += 1
+    end
+  end
+
   def display_result
     clear_screen_and_display_board
 
@@ -207,6 +235,21 @@ class TicTacToeEngine
       puts "Computer Won!"
     else
       puts "The board is full, It's a tie!"
+    end
+    display_scores
+    puts "Press 'enter' key to continue..."
+    gets.chomp
+  end
+
+  def grand_winner?
+    human.score >= GAME_CAP_SCORE || computer.score >= GAME_CAP_SCORE
+  end
+
+  def display_grand_winner
+    if human.score > computer.score
+      puts "You are the grand winner!"
+    else
+      puts "Computer is the grand winner!"
     end
   end
 
@@ -222,10 +265,16 @@ class TicTacToeEngine
     answer == 'y'
   end
 
-  def reset
+  def reset_round
     board.reset
     self.current_marker = FIRST_TO_MOVE
     clear
+  end
+
+  def reset_game
+    reset_round
+    human.score = 0
+    computer.score = 0
   end
 
   def display_play_again_message
