@@ -1,3 +1,9 @@
+module Helpable # TTT helper functions
+  def joinor(array, delimter, word)
+    "#{array[0, array.length - 1].join(delimter)}#{delimter}#{word} #{array[-1]}"
+  end
+end
+
 class Player
   attr_reader :marker
 
@@ -105,6 +111,8 @@ end
 
 # game engine
 class TicTacToeEngine
+  include Helpable
+
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
   FIRST_TO_MOVE = HUMAN_MARKER
@@ -165,7 +173,7 @@ class TicTacToeEngine
   end
 
   def human_moves
-    puts "Choose a square (#{board.unmarked_keys.join(', ')}): "
+    puts "Choose a square (#{joinor(board.unmarked_keys, ', ', 'or')}): "
     square = nil
     loop do
       square = gets.chomp.to_i
