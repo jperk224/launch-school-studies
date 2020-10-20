@@ -61,12 +61,13 @@ class Board
     nil
   end
 
-  # get blocking move
-  def blocking_move(marker)
+  # get blocking move against human 
+  # or winning move if on the verge of winning
+  def strategic_move(marker)
     WINNING_LINES.each do |line|
       squares = @squares.values_at(*line)
-      if opponent_almost_won?(squares, marker)
-        return blocking_square_number(line)
+      if almost_won?(squares, marker)
+        return strategic_square_number(line)
       end
     end
     nil
@@ -120,12 +121,12 @@ class Board
     two_identical_markers?(squares) && one_empty_marker?(squares)
   end
 
-  def opponent_almost_won?(squares, marker)
+  def almost_won?(squares, marker)
     markers = squares.collect(&:marker)
     line_almost_won?(squares) && markers.max == marker
   end
 
-  def blocking_square_number(square_numbers)
+  def strategic_square_number(square_numbers)
     square_numbers.each do |num|
       return num if @squares[num].marker == Square::INITIAL_MARKER
     end
@@ -241,8 +242,11 @@ class TicTacToeEngine
   end
 
   def computer_moves
-    blocking_move = board.blocking_move(HUMAN_MARKER)
-    if blocking_move
+    blocking_move = board.strategic_move(HUMAN_MARKER)
+    winning_move = board.strategic_move(COMPUTER_MARKER)
+    if winning_move
+      board[winning_move] = computer.marker
+    elsif blocking_move
       board[blocking_move] = computer.marker
     else
       board[board.unmarked_keys.sample] = computer.marker
