@@ -2,7 +2,11 @@ require 'pry'
 
 module Helpable # TTT helper functions
   def joinor(array, delimter, word)
-    "#{array[0, array.length - 1].join(delimter)}#{delimter}#{word} #{array[-1]}"
+    if array.length > 1
+      "#{array[0, array.length - 1].join(delimter)}#{delimter}#{word} #{array.last}"
+    else
+      array.first.to_s
+    end
   end
 end
 
@@ -57,6 +61,17 @@ class Board
     nil
   end
 
+  # get blocking move
+  def blocking_move(marker)
+    WINNING_LINES.each do |line|
+      squares = @squares.values_at(*line)
+      if opponent_almost_won?(squares, marker)
+        return blocking_square_number(line)
+      end
+    end
+    nil
+  end
+
   def reset
     (1..9).each do |key|
       @squares[key] = Square.new
@@ -87,6 +102,33 @@ class Board
     markers = squares.select(&:marked?).collect(&:marker)
     return false if markers.size != 3
     markers.min == markers.max
+  end
+
+  def two_identical_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.size != 2
+    markers.min == markers.max
+  end
+
+  def one_empty_marker?(squares)
+    markers = squares.select(&:unmarked?).collect(&:marker)
+    return false if markers.size != 1
+    markers.first == Square::INITIAL_MARKER
+  end
+
+  def line_almost_won?(squares)
+    two_identical_markers?(squares) && one_empty_marker?(squares)
+  end
+
+  def opponent_almost_won?(squares, marker)
+    markers = squares.collect(&:marker)
+    line_almost_won?(squares) && markers.max == marker
+  end
+
+  def blocking_square_number(square_numbers)
+    square_numbers.each do |num|
+      return num if @squares[num].marker == Square::INITIAL_MARKER
+    end
   end
 end
 
@@ -141,16 +183,20 @@ class TicTacToeEngine
     @current_marker = FIRST_TO_MOVE
   end
 
+  def play_round
+    loop do
+      display_board
+      play_set
+      increment_score
+      display_result
+      break if grand_winner?
+      reset_round
+    end
+  end
+
   def main_game
     loop do
-      loop do
-        display_board
-        play_set
-        increment_score
-        display_result
-        break if grand_winner?
-        reset_round
-      end
+      play_round
       display_grand_winner
       break unless play_again?
       reset_game
@@ -195,7 +241,12 @@ class TicTacToeEngine
   end
 
   def computer_moves
-    board[board.unmarked_keys.sample] = computer.marker
+    blocking_move = board.blocking_move(HUMAN_MARKER)
+    if blocking_move
+      board[blocking_move] = computer.marker
+    else
+      board[board.unmarked_keys.sample] = computer.marker
+    end
   end
 
   def current_player_moves
@@ -225,9 +276,7 @@ class TicTacToeEngine
     end
   end
 
-  def display_result
-    clear_screen_and_display_board
-
+  def display_set_winner
     case board.detect_winner
     when HUMAN_MARKER
       puts "You Won!"
@@ -236,6 +285,11 @@ class TicTacToeEngine
     else
       puts "The board is full, It's a tie!"
     end
+  end
+
+  def display_result
+    clear_screen_and_display_board
+    display_set_winner
     display_scores
     puts "Press 'enter' key to continue..."
     gets.chomp
