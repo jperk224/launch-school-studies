@@ -11,12 +11,13 @@ module Helpable # TTT helper functions
 end
 
 class Player
-  attr_reader :marker
+  attr_reader :marker, :name
   attr_accessor :score
 
-  def initialize(marker)
+  def initialize(marker, name)
     @marker = marker
     @score = 0
+    @name = name
   end
 end
 
@@ -61,7 +62,7 @@ class Board
     nil
   end
 
-  # get blocking move against human 
+  # get blocking move against human
   # or winning move if on the verge of winning
   def strategic_move(marker)
     WINNING_LINES.each do |line|
@@ -189,9 +190,24 @@ class TicTacToeEngine
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
+    @human = Player.new(HUMAN_MARKER, get_player_name)
+    @computer = Player.new(COMPUTER_MARKER, get_computer_name)
     @current_marker = FIRST_TO_MOVE
+  end
+
+  def get_player_name
+    name = nil
+    loop do
+      puts "Please enter your name:"
+      name = gets.chomp
+      break unless name.empty?
+      puts "You must enter a character."
+    end
+    name
+  end
+
+  def get_computer_name
+    ['Hal', 'Chappie', 'Sam', 'Johnny 5', 'Matilda'].sample
   end
 
   def play_round
@@ -229,7 +245,7 @@ class TicTacToeEngine
   end
 
   def display_board
-    puts "You're a #{human.marker}.  Computer is #{computer.marker}."
+    puts "#{human.name} is the #{human.marker}.  #{computer.name} is the #{computer.marker}."
     puts ""
     board.draw
     puts ""
@@ -251,15 +267,19 @@ class TicTacToeEngine
     board[square] = human.marker
   end
 
-  def computer_moves
+  def strategic_move?
     blocking_move = board.strategic_move(HUMAN_MARKER)
     winning_move = board.strategic_move(COMPUTER_MARKER)
-    if winning_move
-      board[winning_move] = computer.marker
-    elsif blocking_move
-      board[blocking_move] = computer.marker
-    elsif board.center_free?
-      board[board.center_square] = computer.marker
+    return winning_move if winning_move
+    return blocking_move if blocking_move
+    return board.center_square if board.center_free?
+    nil
+  end
+
+  def computer_moves
+    strategic_move = strategic_move?
+    if strategic_move
+      board[strategic_move] = computer.marker
     else
       board[board.unmarked_keys.sample] = computer.marker
     end
@@ -278,8 +298,8 @@ class TicTacToeEngine
   def display_scores
     puts ""
     puts "Scores:"
-    puts "Human: #{human.score}"
-    puts "Computer: #{computer.score}"
+    puts "#{human.name}: #{human.score}"
+    puts "#{computer.name}: #{computer.score}"
     puts ""
   end
 
@@ -297,7 +317,7 @@ class TicTacToeEngine
     when HUMAN_MARKER
       puts "You Won!"
     when COMPUTER_MARKER
-      puts "Computer Won!"
+      puts "#{computer.name} Won!"
     else
       puts "The board is full, It's a tie!"
     end
@@ -317,9 +337,9 @@ class TicTacToeEngine
 
   def display_grand_winner
     if human.score > computer.score
-      puts "You are the grand winner!"
+      puts "#{human.name} are the grand winner!"
     else
-      puts "Computer is the grand winner!"
+      puts "#{computer.name} is the grand winner!"
     end
   end
 
