@@ -3,7 +3,8 @@ require 'pry'
 module Helpable # TTT helper functions
   def joinor(array, delimter, word)
     if array.length > 1
-      "#{array[0, array.length - 1].join(delimter)}#{delimter}#{word} #{array.last}"
+      "#{array[0, array.length - 1].join(delimter)}"\
+      "#{delimter}#{word} #{array.last}"
     else
       array.first.to_s
     end
@@ -190,12 +191,12 @@ class TicTacToeEngine
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER, get_player_name)
-    @computer = Player.new(COMPUTER_MARKER, get_computer_name)
+    @human = Player.new(HUMAN_MARKER, player_name)
+    @computer = Player.new(COMPUTER_MARKER, computer_name)
     @current_marker = FIRST_TO_MOVE
   end
 
-  def get_player_name
+  def player_name
     name = nil
     loop do
       puts "Please enter your name:"
@@ -206,7 +207,7 @@ class TicTacToeEngine
     name
   end
 
-  def get_computer_name
+  def computer_name
     ['Hal', 'Chappie', 'Sam', 'Johnny 5', 'Matilda'].sample
   end
 
@@ -245,7 +246,8 @@ class TicTacToeEngine
   end
 
   def display_board
-    puts "#{human.name} is the #{human.marker}.  #{computer.name} is the #{computer.marker}."
+    puts "#{human.name} is the #{human.marker}. "\
+         "#{computer.name} is the #{computer.marker}."
     puts ""
     board.draw
     puts ""
