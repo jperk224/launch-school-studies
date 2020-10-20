@@ -73,6 +73,16 @@ class Board
     nil
   end
 
+  def center_square
+    center_square = @squares.length / 2
+    center_square += 1 if @squares.length.odd?
+    center_square
+  end
+
+  def center_free?
+    @squares[center_square].unmarked?
+  end
+
   def reset
     (1..9).each do |key|
       @squares[key] = Square.new
@@ -248,6 +258,8 @@ class TicTacToeEngine
       board[winning_move] = computer.marker
     elsif blocking_move
       board[blocking_move] = computer.marker
+    elsif board.center_free?
+      board[board.center_square] = computer.marker
     else
       board[board.unmarked_keys.sample] = computer.marker
     end
