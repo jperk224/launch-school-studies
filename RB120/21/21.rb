@@ -4,12 +4,13 @@ require 'pry'
 class Participant
   BUST_THRESHOLD = 21
 
-  attr_reader :name
+  attr_reader :name, :hand
 
   def initialize
     # what would the "data" or "states" of a Player object entail?
     # maybe cards? a name?
     @name = name_initialization
+    @hand = []
   end
 
   def hit
@@ -24,13 +25,25 @@ class Participant
 
   def total
     # definitely looks like we need to know about "cards" to produce some total
+    hand.map { |card| card.value }.reduce(:+)
   end
 
   def show_hand
-
+    puts""
+    puts "#{name} has:"
+    print_hand
+    puts ""
   end
 
+  def add_card(card)
+    hand << card
+  end
+
+  private
+
+  # stub to signify child overriding
   def name_initialization; end
+  def print_hand; end
 end
 
 class Player < Participant
@@ -47,6 +60,12 @@ class Player < Participant
     end
     name
   end
+
+  def print_hand
+    hand.each do |card|
+      puts card
+    end
+  end
 end
 
 class Dealer < Participant
@@ -55,6 +74,14 @@ class Dealer < Participant
 
   def name_initialization
     ['Bobby Flay', 'Toby Mac', 'Orlando Hudson', 'Mr. McGregor'].sample
+  end
+
+  def print_hand
+    print_range = hand.length - 2
+    (0..print_range).each do |index|
+      puts hand[index]
+    end
+    puts "One unknown card"
   end
 end
 
@@ -112,8 +139,14 @@ class Game
     deck = Deck.new
     player = Player.new
     dealer = Dealer.new
-    puts player.name
-    puts dealer.name
+    player.add_card(deck.deal)
+    player.add_card(deck.deal)
+    dealer.add_card(deck.deal)
+    dealer.add_card(deck.deal)
+    player.show_hand
+    dealer.show_hand
+    p player.total
+    p dealer.total
     # what's the sequence of steps to execute the game play?
     # deal_cards
     # show_initial_cards
