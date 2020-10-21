@@ -135,24 +135,42 @@ class Card
 end
 
 class Game
+  INITIAL_HAND_SIZE = 2
+
+  attr_reader :player, :dealer, :deck
+
+  def initialize
+    @player = Player.new
+    @dealer = Dealer.new
+    @deck = Deck.new
+  end
+
   def start
-    deck = Deck.new
-    player = Player.new
-    dealer = Dealer.new
-    player.add_card(deck.deal)
-    player.add_card(deck.deal)
-    dealer.add_card(deck.deal)
-    dealer.add_card(deck.deal)
-    player.show_hand
-    dealer.show_hand
+    deal_cards
+    show_initial_cards
     p player.total
     p dealer.total
-    # what's the sequence of steps to execute the game play?
-    # deal_cards
-    # show_initial_cards
     # player_turn
     # dealer_turn
     # show_result
+  end
+
+  private
+
+  def deal_cards
+    (1..INITIAL_HAND_SIZE).each do
+      player.add_card(deck.deal)
+      dealer.add_card(deck.deal)
+    end
+  end
+
+  def show_initial_cards
+    show_hands
+  end
+
+  def show_hands
+    player.show_hand
+    dealer.show_hand
   end
 end
 
