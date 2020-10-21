@@ -41,33 +41,56 @@ class Participant
 end
 
 class Deck
+  attr_reader :cards
+
   def initialize
-    # obviously, we need some data structure to keep track of cards
-    # array, hash, something else?
+    @cards = create_deck
   end
 
   def deal
     # does the dealer or the deck deal?
   end
+
+  private
+
+  def create_deck
+    cards = []
+    suits = %w(Hearts Diamonds Clubs Spades)
+    faces = (2..10).to_a + %w(Jack Queen King Ace)
+    suits_with_faces = suits.product(faces)
+    suits_with_faces.each do |card|
+      cards << Card.new(card[0], card[1])
+    end
+    cards
+  end
 end
 
 class Card
-  attr_reader: suit, face
+  attr_reader :suit, :face
 
   def initialize(suit, face)
     @suit = suit
     @face = face
   end
+
+  private
+
+  def to_s
+    "#{face} of #{suit}"
+  end
 end
 
 class Game
   def start
+    deck = Deck.new
+    puts deck.cards
+    puts deck.cards.length
     # what's the sequence of steps to execute the game play?
-    deal_cards
-    show_initial_cards
-    player_turn
-    dealer_turn
-    show_result
+    # deal_cards
+    # show_initial_cards
+    # player_turn
+    # dealer_turn
+    # show_result
   end
 end
 
