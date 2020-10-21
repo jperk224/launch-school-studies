@@ -18,28 +18,6 @@ class Player
   end
 end
 
-class Dealer
-  def initialize
-    # seems like very similar to Player... do we even need this?
-  end
-
-  def hit
-  end
-
-  def stay
-  end
-
-  def busted?
-  end
-
-  def total
-  end
-end
-
-class Participant
-  # what goes in here? all the redundant behaviors from Player and Dealer?
-end
-
 class Deck
   attr_reader :cards
 
@@ -48,7 +26,9 @@ class Deck
   end
 
   def deal
-    # does the dealer or the deck deal?
+    card = cards.sample
+    index = cards.find_index(card)
+    cards.delete_at(index)
   end
 
   private
@@ -62,6 +42,11 @@ class Deck
       cards << Card.new(card[0], card[1])
     end
     cards
+  end
+
+  # do we need this?
+  def empty_deck?
+    cards.length < 1
   end
 end
 
@@ -83,8 +68,6 @@ end
 class Game
   def start
     deck = Deck.new
-    puts deck.cards
-    puts deck.cards.length
     # what's the sequence of steps to execute the game play?
     # deal_cards
     # show_initial_cards
