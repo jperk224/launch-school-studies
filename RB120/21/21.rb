@@ -8,7 +8,7 @@ class Participant
 
   def initialize
     @name = name_initialization
-    @hand = []
+    self.hand = []
   end
 
   def busted?
@@ -30,11 +30,24 @@ class Participant
     hand << card
   end
 
+  def empty_hand
+    self.hand = []
+  end
+
   private
+
+  attr_writer :hand
 
   # stub to signify child overriding
   def name_initialization; end
-  def print_hand; end
+
+  protected
+
+  def print_hand
+    hand.each do |card|
+      puts card
+    end
+  end
 end
 
 class Player < Participant
@@ -51,15 +64,13 @@ class Player < Participant
     end
     name
   end
-
-  def print_hand
-    hand.each do |card|
-      puts card
-    end
-  end
 end
 
 class Dealer < Participant
+
+  def print_full_hand
+    Participant.instance_method(:print_hand).bind(self).call
+  end
 
   private
 
@@ -80,7 +91,7 @@ class Deck
   attr_reader :cards
 
   def initialize
-    @cards = create_deck
+    self.cards = create_deck
   end
 
   def deal
@@ -89,7 +100,14 @@ class Deck
     cards.delete_at(index)
   end
 
+  def reset
+    self.cards = []
+    self.cards = create_deck
+  end
+
   private
+
+  attr_writer :cards
 
   def create_deck
     cards = []
@@ -141,12 +159,18 @@ class Game
   def start
     display_welcome_message
     loop do
-      deal_cards
-      show_initial_cards
-      player_turn
-      dealer_turn
-      # show_result
+      loop do
+        deal_cards
+        show_initial_cards
+        player_turn
+        break if player.busted?
+        dealer_turn
+        break if dealer.busted?
+        break
+      end
+      show_result
       break unless play_again
+      reset
     end
     display_goodbye_message
   end
@@ -176,6 +200,26 @@ class Game
     return false if valid_no.include?(choice)
   end
 
+  def reset
+    deck.reset
+    player.empty_hand
+    dealer.empty_hand
+  end
+
+  def show_result
+    if player.busted?
+      puts "#{player.name} busts! #{dealer.name} wins!"
+    elsif dealer.busted?
+      puts "#{dealer.name} busts! #{player.name} wins!"
+    else
+      display_winner_and_totals
+    end
+  end
+
+  def display_winner_and_totals
+    
+  end
+
   def deal_cards
     (1..INITIAL_HAND_SIZE).each do
       player.add_card(deck.deal)
@@ -190,10 +234,6 @@ class Game
   def show_hands
     player.show_hand
     dealer.show_hand
-  end
-
-  def advance_turn
-
   end
 
   def prompt_player
@@ -213,26 +253,6 @@ class Game
     gets.chomp
   end
 
-  def player_busted
-    if player.busted?
-      puts "#{player.name} busts!"
-      puts ""
-      true
-    else
-      false
-    end
-  end
-
-  def dealer_busted
-    if dealer.busted?
-      puts "#{dealer.name} busts!"
-      puts ""
-      true
-    else
-      false
-    end
-  end
-
   def player_turn
     loop do
       choice = prompt_player
@@ -240,7 +260,7 @@ class Game
       break unless hit
       player.add_card(deck.deal)
       show_hands
-      break if player_busted
+      break if player.busted?
     end
   end
 
@@ -251,7 +271,7 @@ class Game
       dealer.add_card(deck.deal)
       show_hands
       prompt_to_continue
-      return if dealer_busted
+      return if dealer.busted?
     end
     puts "\n#{dealer.name} stays."
   end
