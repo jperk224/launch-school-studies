@@ -217,7 +217,14 @@ class Game
   end
 
   def display_winner_and_totals
-    
+    puts "\nTotals:"
+    puts "#{player.name}: #{player.total}"
+    puts "#{dealer.name}: #{dealer.total}"
+    if player.total > dealer.total
+      puts "#{player.name} wins!"
+    else
+      puts "#{dealer.name} wins!"
+    end
   end
 
   def deal_cards
