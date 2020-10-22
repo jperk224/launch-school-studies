@@ -139,14 +139,42 @@ class Game
   end
 
   def start
-    deal_cards
-    show_initial_cards
-    player_turn
-    dealer_turn
-    # show_result
+    display_welcome_message
+    loop do
+      deal_cards
+      show_initial_cards
+      player_turn
+      dealer_turn
+      # show_result
+      break unless play_again
+    end
+    display_goodbye_message
   end
 
   private
+
+  def display_welcome_message
+    puts  "\nWelcome to 21 #{player.name}! "\
+          "You are playing against #{dealer.name}."
+  end
+
+  def display_goodbye_message
+    puts "Thanks for playing! Goodbye!"
+  end
+
+  def play_again
+    choice = nil
+    valid_yes = %w(y yes)
+    valid_no = %w(n no)
+    loop do
+      puts "\nWould you like to play again ([Y]es/[N]o)?"
+      choice = gets.chomp.downcase
+      break if valid_yes.include?(choice) || valid_no.include?(choice)
+      puts "That is not a valid choice"
+    end
+    return true if valid_yes.include?(choice)
+    return false if valid_no.include?(choice)
+  end
 
   def deal_cards
     (1..INITIAL_HAND_SIZE).each do
@@ -219,14 +247,13 @@ class Game
   def dealer_turn
     loop do
       break if dealer.total >= DEALER_THRESHOLD
-      puts ""
-      puts "Dealer takes a card."
+      puts "\n#{dealer.name} takes a card."
       dealer.add_card(deck.deal)
       show_hands
       prompt_to_continue
       return if dealer_busted
     end
-    puts "Dealer stays."
+    puts "\n#{dealer.name} stays."
   end
 end
 
