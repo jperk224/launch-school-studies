@@ -7,16 +7,8 @@ class Participant
   attr_reader :name, :hand
 
   def initialize
-    # what would the "data" or "states" of a Player object entail?
-    # maybe cards? a name?
     @name = name_initialization
     @hand = []
-  end
-
-  def hit
-  end
-
-  def stay
   end
 
   def busted?
@@ -24,7 +16,6 @@ class Participant
   end
 
   def total
-    # definitely looks like we need to know about "cards" to produce some total
     hand.map { |card| card.value }.reduce(:+)
   end
 
@@ -136,6 +127,8 @@ end
 
 class Game
   INITIAL_HAND_SIZE = 2
+  MOVE_CHOICES = %w(h s hit stay)
+  DEALER_THRESHOLD = 17
 
   attr_reader :player, :dealer, :deck
 
@@ -148,10 +141,8 @@ class Game
   def start
     deal_cards
     show_initial_cards
-    p player.total
-    p dealer.total
-    # player_turn
-    # dealer_turn
+    player_turn
+    dealer_turn
     # show_result
   end
 
@@ -171,6 +162,71 @@ class Game
   def show_hands
     player.show_hand
     dealer.show_hand
+  end
+
+  def advance_turn
+
+  end
+
+  def prompt_player
+    player_choice = nil
+    loop do
+      puts "Would you like to [H]it or [S]tay?"
+      player_choice = gets.chomp
+      break if MOVE_CHOICES.include?(player_choice.downcase)
+      puts "That is not a valid choice.  Please try again."
+      puts ""
+    end
+    player_choice
+  end
+
+  def prompt_to_continue
+    puts "Press 'return' key to continue."
+    gets.chomp
+  end
+
+  def player_busted
+    if player.busted?
+      puts "#{player.name} busts!"
+      puts ""
+      true
+    else
+      false
+    end
+  end
+
+  def dealer_busted
+    if dealer.busted?
+      puts "#{dealer.name} busts!"
+      puts ""
+      true
+    else
+      false
+    end
+  end
+
+  def player_turn
+    loop do
+      choice = prompt_player
+      hit = ['h', 'hit'].include?(choice.downcase) ? true : false
+      break unless hit
+      player.add_card(deck.deal)
+      show_hands
+      break if player_busted
+    end
+  end
+
+  def dealer_turn
+    loop do
+      break if dealer.total >= DEALER_THRESHOLD
+      puts ""
+      puts "Dealer takes a card."
+      dealer.add_card(deck.deal)
+      show_hands
+      prompt_to_continue
+      return if dealer_busted
+    end
+    puts "Dealer stays."
   end
 end
 
