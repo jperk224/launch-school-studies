@@ -165,6 +165,7 @@ class Game
   end
 
   def start
+    system 'clear'
     display_welcome_message
     loop do
       play_hand
@@ -212,6 +213,7 @@ class Game
   end
 
   def reset
+    system 'clear'
     deck.reset
     player.empty_hand
     dealer.empty_hand
@@ -285,6 +287,7 @@ class Game
   def player_turn
     loop do
       choice = prompt_player
+      system 'clear'
       hit = ['h', 'hit'].include?(choice.downcase) ? true : false
       break unless hit
       player.add_card(deck.deal)
@@ -295,6 +298,7 @@ class Game
 
   def dealer_hits
     loop do
+      system 'clear'
       break if dealer.total >= DEALER_THRESHOLD
       puts "\n#{dealer.name} takes a card."
       dealer.add_card(deck.deal)
