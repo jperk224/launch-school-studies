@@ -230,6 +230,8 @@ class Game
   end
 
   def display_totals
+    puts "\nFinal Hands:"
+    show_full_hands
     puts "\nTotals:"
     puts "#{player.name}: #{player.total}"
     puts "#{dealer.name}: #{dealer.total}"
@@ -238,11 +240,11 @@ class Game
   def display_winner
     display_totals
     if player.total > dealer.total
-      puts "#{player.name} wins!"
+      puts "\n#{player.name} wins!"
     elsif dealer.total > player.total
-      puts "#{dealer.name} wins!"
+      puts "\n#{dealer.name} wins!"
     else
-      puts "Push! No winner."
+      puts "\nPush! No winner."
     end
   end
 
