@@ -15,8 +15,17 @@ class Participant
     total > MAX_HAND_VALUE
   end
 
-  def total #TODO: add Ace 1/11 logic
-    hand.map { |card| card.value }.reduce(:+)
+  def total
+    hand_values = hand.map { |card| card.value }
+    ace_count = hand_values.count(11)
+    total = hand_values.reduce(:+)
+      if ace_count > 0
+        while total > 21 && ace_count > 0
+          total -= 10
+          ace_count -= 1
+        end
+      end
+    total
   end
 
   def show_hand
@@ -229,8 +238,10 @@ class Game
     puts "#{dealer.name}: #{dealer.total}"
     if player.total > dealer.total
       puts "#{player.name} wins!"
-    else
+    elsif dealer.total > player.total
       puts "#{dealer.name} wins!"
+    else
+      puts "Push! No winner."
     end
   end
 
@@ -284,6 +295,7 @@ class Game
   end
 
   def dealer_turn
+    show_full_hands
     loop do
       break if dealer.total >= DEALER_THRESHOLD
       puts "\n#{dealer.name} takes a card."
