@@ -16,20 +16,20 @@ class Participant
   end
 
   def total
-    hand_values = hand.map { |card| card.value }
+    hand_values = hand.map(&:value)
     ace_count = hand_values.count(11)
     total = hand_values.reduce(:+)
-      if ace_count > 0
-        while total > 21 && ace_count > 0
-          total -= 10
-          ace_count -= 1
-        end
+    if ace_count > 0
+      while total > 21 && ace_count > 0
+        total -= 10
+        ace_count -= 1
       end
+    end
     total
   end
 
   def show_hand
-    puts""
+    puts ""
     puts "#{name} has:"
     print_hand
     puts ""
@@ -60,7 +60,6 @@ class Participant
 end
 
 class Player < Participant
-
   private
 
   def name_initialization
@@ -76,13 +75,12 @@ class Player < Participant
 end
 
 class Dealer < Participant
-
   def print_full_hand
     Participant.instance_method(:print_hand).bind(self).call
   end
 
   def show_full_hand
-    puts""
+    puts ""
     puts "#{name} has:"
     print_full_hand
     puts ""
@@ -145,7 +143,7 @@ end
 class Card
   VALUES =  (((2..10).to_a + %w(Jack Queen King Ace))\
             .zip((2..10).to_a + [10, 10, 10, 11])).to_h
-  
+
   attr_reader :suit, :face, :value
 
   def initialize(suit, face)
@@ -175,15 +173,7 @@ class Game
   def start
     display_welcome_message
     loop do
-      loop do
-        deal_cards
-        show_initial_cards
-        player_turn
-        break if player.busted?
-        dealer_turn
-        break if dealer.busted?
-        break
-      end
+      play_hand
       show_result
       break unless play_again
       reset
@@ -192,6 +182,18 @@ class Game
   end
 
   private
+
+  def play_hand
+    loop do
+      deal_cards
+      show_initial_cards
+      player_turn
+      break if player.busted?
+      dealer_turn
+      break if dealer.busted?
+      break
+    end
+  end
 
   def display_welcome_message
     puts  "\nWelcome to 21 #{player.name}! "\
@@ -212,8 +214,7 @@ class Game
       break if valid_yes.include?(choice) || valid_no.include?(choice)
       puts "That is not a valid choice"
     end
-    return true if valid_yes.include?(choice)
-    return false if valid_no.include?(choice)
+    valid_yes.include?(choice)
   end
 
   def reset
@@ -228,14 +229,18 @@ class Game
     elsif dealer.busted?
       puts "#{dealer.name} busts! #{player.name} wins!"
     else
-      display_winner_and_totals
+      display_winner
     end
   end
 
-  def display_winner_and_totals
+  def display_totals
     puts "\nTotals:"
     puts "#{player.name}: #{player.total}"
     puts "#{dealer.name}: #{dealer.total}"
+  end
+
+  def display_winner
+    display_totals
     if player.total > dealer.total
       puts "#{player.name} wins!"
     elsif dealer.total > player.total
@@ -294,8 +299,7 @@ class Game
     end
   end
 
-  def dealer_turn
-    show_full_hands
+  def dealer_hits
     loop do
       break if dealer.total >= DEALER_THRESHOLD
       puts "\n#{dealer.name} takes a card."
@@ -304,7 +308,12 @@ class Game
       prompt_to_continue
       return if dealer.busted?
     end
-    puts "\n#{dealer.name} stays."
+  end
+
+  def dealer_turn
+    show_full_hands
+    dealer_hits
+    puts "\n#{dealer.name} stays." if !dealer.busted?
   end
 end
 
