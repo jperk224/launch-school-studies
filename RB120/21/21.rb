@@ -2,7 +2,7 @@ require 'pry'
 
 # parent class for human player and computer dealer
 class Participant
-  BUST_THRESHOLD = 21
+  MAX_HAND_VALUE = 21
 
   attr_reader :name, :hand
 
@@ -12,10 +12,10 @@ class Participant
   end
 
   def busted?
-    total > BUST_THRESHOLD
+    total > MAX_HAND_VALUE
   end
 
-  def total
+  def total #TODO: add Ace 1/11 logic
     hand.map { |card| card.value }.reduce(:+)
   end
 
@@ -70,6 +70,13 @@ class Dealer < Participant
 
   def print_full_hand
     Participant.instance_method(:print_hand).bind(self).call
+  end
+
+  def show_full_hand
+    puts""
+    puts "#{name} has:"
+    print_full_hand
+    puts ""
   end
 
   private
@@ -243,6 +250,11 @@ class Game
     dealer.show_hand
   end
 
+  def show_full_hands
+    player.show_hand
+    dealer.show_full_hand
+  end
+
   def prompt_player
     player_choice = nil
     loop do
@@ -276,7 +288,7 @@ class Game
       break if dealer.total >= DEALER_THRESHOLD
       puts "\n#{dealer.name} takes a card."
       dealer.add_card(deck.deal)
-      show_hands
+      show_full_hands
       prompt_to_continue
       return if dealer.busted?
     end
