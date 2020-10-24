@@ -125,24 +125,18 @@ class Deck
 
   def create_deck
     cards = []
-    suits = %w(Hearts Diamonds Clubs Spades)
-    faces = (2..10).to_a + %w(Jack Queen King Ace)
-    suits_with_faces = suits.product(faces)
+    suits_with_faces = Card::SUITS.product(Card::FACES)
     suits_with_faces.each do |card|
       cards << Card.new(card[0], card[1])
     end
     cards
   end
-
-  # do we need this?
-  def not_empty?
-    !cards.empty?
-  end
 end
 
 class Card
-  VALUES =  (((2..10).to_a + %w(Jack Queen King Ace))\
-            .zip((2..10).to_a + [10, 10, 10, 11])).to_h
+  SUITS = %w(Hearts Diamonds Clubs Spades)
+  FACES = (2..10).to_a + %w(Jack Queen King Ace)
+  VALUES = (FACES.zip((2..10).to_a + [10, 10, 10, 11])).to_h
 
   attr_reader :suit, :face, :value
 
