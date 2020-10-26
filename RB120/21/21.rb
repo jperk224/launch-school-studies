@@ -1,5 +1,3 @@
-require 'pry'
-
 # parent class for human player and computer dealer
 class Participant
   MAX_HAND_VALUE = 21
@@ -15,10 +13,8 @@ class Participant
     total > MAX_HAND_VALUE
   end
 
-  def total
-    hand_values = hand.map(&:value)
+  def calcuate_for_aces(hand_values, total)
     ace_count = hand_values.count(11)
-    total = hand_values.reduce(:+)
     if ace_count > 0
       while total > 21 && ace_count > 0
         total -= 10
@@ -26,6 +22,12 @@ class Participant
       end
     end
     total
+  end
+
+  def total
+    hand_values = hand.map(&:value)
+    total = hand_values.reduce(:+)
+    calcuate_for_aces(hand_values, total)
   end
 
   def show_hand
@@ -47,9 +49,6 @@ class Participant
 
   attr_writer :hand
 
-  # stub to signify child overriding
-  def name_initialization; end
-
   protected
 
   def print_hand
@@ -67,7 +66,7 @@ class Player < Participant
     loop do
       puts "Please enter your name."
       name = gets.chomp
-      break unless name.empty?
+      break unless name.empty? || !name.match?(/[A-Za-z0-9]/)
       puts "Please enter at least one letter or number."
     end
     name
@@ -230,11 +229,12 @@ class Game
   end
 
   def display_totals
+    system 'clear'
     puts "\nFinal Hands:"
     show_full_hands
-    puts "\nTotals:"
-    puts "#{player.name}: #{player.total}"
-    puts "#{dealer.name}: #{dealer.total}"
+    # puts "\nTotals:"
+    # puts "#{player.name}: #{player.total}"
+    # puts "#{dealer.name}: #{dealer.total}"
   end
 
   def display_winner
@@ -259,14 +259,25 @@ class Game
     show_hands
   end
 
+  def display_player_total
+    puts "#{player.name} has: #{player.total}"
+  end
+
+  def display_dealer_total
+    puts "#{dealer.name} has: #{dealer.total}"
+  end
+
   def show_hands
     player.show_hand
+    display_player_total
     dealer.show_hand
   end
 
   def show_full_hands
     player.show_hand
+    display_player_total
     dealer.show_full_hand
+    display_dealer_total
   end
 
   def prompt_player
@@ -282,7 +293,7 @@ class Game
   end
 
   def prompt_to_continue
-    puts "Press 'return' key to continue."
+    puts "\nPress 'return' key to continue."
     gets.chomp
   end
 
@@ -290,7 +301,7 @@ class Game
     loop do
       choice = prompt_player
       system 'clear'
-      hit = ['h', 'hit'].include?(choice.downcase) ? true : false
+      hit = ['h', 'hit'].include?(choice.downcase)
       break unless hit
       player.add_card(deck.deal)
       show_hands
