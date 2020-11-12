@@ -54,14 +54,15 @@ class Guess
 end
 
 class GuessingGame
-  NUMBER_OF_GUESSES = 7
-  RANGE_LOW = 1
-  RANGE_HIGH = 100
+  def initialize(range_low, range_high)
+    @secret_number = nil
+    @range_low = range_low
+    @range_high = range_high
+    @remaining_guesses = nil
+  end
 
   def play
-    self.secret_number = rand(RANGE_LOW..RANGE_HIGH)
-    self.remaining_guesses = NUMBER_OF_GUESSES
-    self.guess = Guess.new(0)
+    reset
     guess_instances
   end
 
@@ -87,12 +88,12 @@ class GuessingGame
   end
 
   def user_guess
-    puts "Enter a number between #{RANGE_LOW} and #{RANGE_HIGH}:"
+    puts "Enter a number between #{range_low} and #{range_high}:"
     user_input = gets.chomp.to_i
     loop do
-      break if (RANGE_LOW..RANGE_HIGH).cover?(user_input)
+      break if (range_low..range_high).cover?(user_input)
       puts "That is not valid input."
-      puts "Enter a number between #{RANGE_LOW} and #{RANGE_HIGH}"
+      puts "Enter a number between #{range_low} and #{range_high}"
       user_input = gets.chomp.to_i
     end
     user_input
@@ -110,9 +111,20 @@ class GuessingGame
     end
   end
 
+  def max_guesses
+    Math.log2(range_high - range_low).to_i + 1
+  end
+
+  def reset
+    self.secret_number = rand(range_low..range_high)
+    self.remaining_guesses = max_guesses
+    self.guess = Guess.new(0)
+  end
+
   attr_accessor :secret_number, :remaining_guesses, :guess
+  attr_reader :range_low, :range_high
 end
 
 # examples
-game = GuessingGame.new
+game = GuessingGame.new(501, 1500)
 game.play
